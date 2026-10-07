@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink:    #0E0E0E;
+  --slate:  #5A5A6E;
+  --mist:   #F0EFF8;
+  --violet: #4B3FCC;
+  --violet-light: #EAE8FA;
+  --signal: #00C37A;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #FAFAFA;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Graph node animation */
+@keyframes pulse-node {
+  0%, 100% { opacity: 1; r: 5; }
+  50%       { opacity: .6; r: 7; }
+}
+@keyframes draw-edge {
+  from { stroke-dashoffset: 300; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes float-card {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up { animation: fade-up .5s ease both; }
+.animate-float   { animation: float-card 4s ease-in-out infinite; }
+
+/* Form focus ring */
+input:focus { outline: 2px solid var(--violet); outline-offset: 2px; }
