@@ -2,10 +2,10 @@ import './globals.css'
 
 export const metadata = {
   title: 'NetGraph — Votre réseau a plus de valeur que vous ne le pensez',
-  description: 'Transformez vos contacts en opportunités. NetGraph détecte automatiquement les synergies cachées dans votre réseau professionnel.',
+  description: 'Dites ce que vous cherchez : NetGraph trouve, parmi vos contacts et les contacts de vos contacts, qui peut vous aider — et qui peut vous le présenter.',
   openGraph: {
     title: 'NetGraph',
-    description: 'Cartographie relationnelle & intelligence réseau',
+    description: 'Trouvez qui peut vous aider dans votre réseau, à deux contacts près',
     type: 'website',
   },
 }
