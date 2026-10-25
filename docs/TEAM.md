@@ -27,6 +27,7 @@ Professionals import their existing contacts (phone, LinkedIn, Instagram, Excel)
 ## Where things live
 
 - **Backlog:** GitHub Issues on `oussamaallaoui/netgraph-landing`. Labels: `story`, `task`, `bug`, `frontend`, `backend`, `qa`, `blocked`. One milestone per sprint (`Sprint 1`, `Sprint 2`, …).
+- **Wiki:** `docs/wiki/` (start at `docs/wiki/README.md`): product vision, glossary, roadmap, architecture, deployment, conventions, known issues, data and privacy. Read the relevant pages before starting a task.
 - **Sprint notes:** `docs/sprints/sprint-N.md` (goal, committed stories, demo, retro).
 - **Architecture decisions:** `docs/adr/NNNN-title.md`.
 - **Code:** one branch per story, `feat/<issue>-<slug>` or `fix/<issue>-<slug>`, one PR per story, linked with `Closes #N`.
@@ -47,4 +48,4 @@ Professionals import their existing contacts (phone, LinkedIn, Instagram, Excel)
 - Reviewed by the tech lead
 - No console errors; keyboard and screen-reader basics work; text contrast ≥ 4.5:1 for anything new
 - Copy in French, following the design system
-- Docs or ADR updated when the architecture changed
+- Wiki pages updated when behaviour, architecture, deployment or known issues changed; ADR written for hard-to-reverse decisions
