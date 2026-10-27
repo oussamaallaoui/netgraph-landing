@@ -17,7 +17,7 @@ Everything the team needs to know about NetGraph, kept next to the code. Pages a
 - [Deployment](engineering/deployment.md): Vercel, production and previews
 - [Conventions](engineering/conventions.md): branches, commits, PRs, code layout, tests
 - [Known issues](engineering/known-issues.md): what's broken or risky right now
-- Architecture decisions: [`docs/adr/`](../adr/) (none yet)
+- Architecture decisions: [`docs/adr/`](../adr/), starting with [0001 Local-first contacts](../adr/0001-local-first-contacts.md)
 
 ## Design
 
@@ -30,7 +30,7 @@ Everything the team needs to know about NetGraph, kept next to the code. Pages a
 ## Team
 
 - [Team and sprint workflow](../TEAM.md): roles, sprint loop, definition of done
-- Sprint notes: [`docs/sprints/`](../sprints/) (none yet)
+- Sprint notes: [`docs/sprints/`](../sprints/), current: [Sprint 1](../sprints/sprint-1.md)
 
 ## Editing the wiki
 
