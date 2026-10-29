@@ -6,3 +6,10 @@ npm-debug.log*
 
 # Written by app/api/subscribe/route.js — contains subscriber emails
 subscribers.json
+
+# Contact exports (real or generated) must never be committed.
+# Only the fictional fixtures in lib/fixtures/ are allowed.
+Connections*.csv
+*.vcf
+!lib/fixtures/Connections.sample.csv
+!lib/fixtures/*.sample.vcf
