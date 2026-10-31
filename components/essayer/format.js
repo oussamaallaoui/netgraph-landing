@@ -12,7 +12,12 @@ export function importedLabel(n) {
   return n <= 1 ? `${formatNumber(n)} relation importée` : `${formatNumber(n)} relations importées`
 }
 
-/** « 1 ligne ignorée » / « 3 lignes ignorées ». */
+/**
+ * « 1 ligne ignorée (sans nom ou en double) » / « 3 lignes ignorées (sans nom ou en double) ».
+ * The UI shows it only when n > 0. skipped = rows with no name + repeats of an earlier row.
+ */
 export function skippedLabel(n) {
-  return n <= 1 ? `${formatNumber(n)} ligne ignorée` : `${formatNumber(n)} lignes ignorées`
+  return n <= 1
+    ? `${formatNumber(n)} ligne ignorée (sans nom ou en double)`
+    : `${formatNumber(n)} lignes ignorées (sans nom ou en double)`
 }

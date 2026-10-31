@@ -1,12 +1,19 @@
 'use client'
 // « Effacer mes données de cet appareil », with an inline confirmation step
-// (no window.confirm). The parent calls clearAllData() and resets its state.
+// (no window.confirm). The parent calls clearAllData() and resets its state;
+// onClear resolves to { cleared }. When cleared is false the parent passes an
+// `error` message and this button stays usable for another try.
+// Rendered only when something is loaded (imported or sample).
 
 import { useEffect, useRef, useState } from 'react'
-import { formatNumber } from './format'
 import { BUTTON_DANGER, BUTTON_DANGER_OUTLINE, BUTTON_SECONDARY } from './ui'
 
-export default function ClearDataButton({ count, onClear }) {
+/**
+ * @param {object} props
+ * @param {() => Promise<{ cleared: boolean }>} props.onClear
+ * @param {string | null} [props.error]
+ */
+export default function ClearDataButton({ onClear, error }) {
   const [confirming, setConfirming] = useState(false)
   const [busy, setBusy] = useState(false)
   const cancelRef = useRef(null)
@@ -28,7 +35,11 @@ export default function ClearDataButton({ count, onClear }) {
 
   async function confirm() {
     setBusy(true)
-    await onClear()
+    const result = await onClear()
+    if (!result?.cleared) {
+      // Nothing was claimed as deleted: let the person retry after closing other tabs.
+      setBusy(false)
+    }
   }
 
   return (
@@ -50,13 +61,11 @@ export default function ClearDataButton({ count, onClear }) {
           onKeyDown={e => { if (e.key === 'Escape' && !busy) cancel() }}
         >
           <p id="clear-confirm-text" className="mb-4 text-sm leading-relaxed text-ink">
-            {count <= 1
-              ? `Effacer ${formatNumber(count)} relation de cet appareil ? Cette action est définitive.`
-              : `Effacer les ${formatNumber(count)} relations de cet appareil ? Cette action est définitive.`}
+            Effacer vos relations de cet appareil ? Cette action est définitive.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={confirm} disabled={busy} className={BUTTON_DANGER}>
-              {busy ? 'Effacement…' : 'Oui, tout effacer'}
+              {busy ? 'Effacement…' : 'Effacer définitivement'}
             </button>
             <button ref={cancelRef} type="button" onClick={cancel} disabled={busy} className={BUTTON_SECONDARY}>
               Annuler
@@ -64,8 +73,11 @@ export default function ClearDataButton({ count, onClear }) {
           </div>
         </div>
       )}
+      <div aria-live="polite">
+        {error && <p className="mt-3 text-sm font-medium leading-relaxed text-red-700">{error}</p>}
+      </div>
       <p className="mt-3 text-xs leading-relaxed text-slate">
-        Effacer les données du site dans les réglages de votre navigateur supprime aussi tout.
+        Effacer les données de ce site dans les réglages de votre navigateur supprime aussi tout.
       </p>
     </div>
   )
