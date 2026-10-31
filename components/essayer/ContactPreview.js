@@ -38,7 +38,7 @@ export default function ContactPreview({ headingRef, contacts, isSample, skipped
         </h1>
         {skipped > 0 && (
           <p className="mt-2 text-sm text-slate">
-            {skippedLabel(skipped)} (sans prénom ni nom).
+            {skippedLabel(skipped)}
           </p>
         )}
         <p className="mt-3 text-sm leading-relaxed text-slate">
