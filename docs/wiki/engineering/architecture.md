@@ -29,7 +29,7 @@ Decision record: [ADR 0001](../../adr/0001-local-first-contacts.md). In short:
 - Contacts are parsed, matched and stored **only in the browser**. No server route receives contacts or requests; no analytics or error reporting on `/essayer`; no `console.*` with contact data.
 - **Storage:** IndexedDB (`netgraph` database, `kv` store, key `contacts`), one record replaced on each import. Requests, results and drafts are not persisted. UI preferences only may go in `localStorage` under `netgraph:*`.
 - **Deletion:** « Effacer mes données de cet appareil » deletes the IndexedDB database and the `netgraph:*` keys.
-- **Guard rail:** `/essayer` is served with `Content-Security-Policy: connect-src 'self'` and `Referrer-Policy: no-referrer` (set in `next.config.js` `headers()`). Side effect: the Vercel toolbar on preview deployments can't connect on that page; that's expected.
+- **Guard rail:** `/essayer` is served with `Content-Security-Policy: connect-src 'self'` and `Referrer-Policy: no-referrer` (set in `next.config.js` `headers()`), served on every route (`/:path*`) so client-side navigation from `/` keeps it. Side effect: the Vercel toolbar on preview deployments can't connect on any page; that's expected, and QA ignores `vercel.live` CSP violations on previews only.
 - **Hand-offs** (`mailto:`, LinkedIn profile, `wa.me` for #9) are user-triggered navigations to the user's own apps; nothing is sent by NetGraph.
 
 ## The `/essayer` route
