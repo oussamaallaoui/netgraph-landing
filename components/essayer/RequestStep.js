@@ -51,7 +51,7 @@ export default function RequestStep({ contacts, isSample }) {
     }
     const { top } = heading.getBoundingClientRect()
     if (top < 0 || top > window.innerHeight - 96) {
-      heading.scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
+      heading.scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'instant' : 'smooth' })
     }
   }, [search])
 
@@ -92,7 +92,7 @@ export default function RequestStep({ contacts, isSample }) {
           Décrivez votre besoin
         </h2>
         <p className="mb-6 max-w-xl text-sm leading-relaxed text-slate">
-          La recherche se fait sur cet appareil : votre demande n&apos;est jamais envoyée à NetGraph.
+          La recherche se fait sur cet appareil : votre demande n&apos;est pas envoyée à NetGraph.
         </p>
         <RequestForm
           value={value}

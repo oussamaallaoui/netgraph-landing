@@ -38,7 +38,6 @@ export default function RequestForm({ value, onChange, onSubmit, showEmptyError,
           id={inputId}
           ref={inputRef}
           type="text"
-          inputMode="text"
           enterKeyHint="search"
           autoComplete="off"
           autoCorrect="off"
