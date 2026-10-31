@@ -3,6 +3,7 @@
 
 import { importedLabel, skippedLabel, formatNumber } from './format'
 import { FOCUS } from './ui'
+import SampleBadge from './SampleBadge'
 
 const PREVIEW_ROWS = 10
 
@@ -23,10 +24,7 @@ export default function ContactPreview({ headingRef, contacts, isSample, skipped
     <section aria-labelledby="preview-heading">
       <div aria-live="polite">
         {isSample && (
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-violet-light px-3 py-1.5 text-xs font-medium text-violet">
-            <span className="h-1.5 w-1.5 rounded-full bg-violet" aria-hidden="true" />
-            Contacts d'exemple (fictifs)
-          </p>
+          <SampleBadge className="mb-4" />
         )}
         <h1
           id="preview-heading"

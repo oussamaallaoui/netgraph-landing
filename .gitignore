@@ -13,3 +13,6 @@ Connections*.csv
 *.vcf
 !lib/fixtures/Connections.sample.csv
 !lib/fixtures/*.sample.vcf
+
+# Agent worktrees (Claude Code)
+.claude/worktrees/

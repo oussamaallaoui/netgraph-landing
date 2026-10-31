@@ -1,6 +1,6 @@
 'use client'
 // /essayer: step state. Loads the stored contacts on mount, shows the import
-// step or the preview. Contacts live in React state and in lib/store.js
+// step, or the preview followed by the request and results step (#6). Contacts live in React state and in lib/store.js
 // (IndexedDB, this device only). Nothing here sends, logs or tracks contact data.
 
 import { useEffect, useRef, useState } from 'react'
@@ -9,6 +9,7 @@ import Logo from '../Logo'
 import ImportStep from './ImportStep'
 import ContactPreview from './ContactPreview'
 import ClearDataButton from './ClearDataButton'
+import RequestStep from './RequestStep'
 import Arrow from './Arrow'
 import { importErrorMessage } from './importErrors'
 import { loadContacts, saveContacts, clearAllData } from '../../lib/store.js'
@@ -29,6 +30,9 @@ export default function TryApp() {
   const [clearBlocked, setClearBlocked] = useState(false)
   // Failed re-import while a previous import is stored: shown above the previous preview.
   const [importError, setImportError] = useState(null)
+  // Bumped on each successful import: remounts RequestStep, so a new import starts
+  // with an empty request and no results.
+  const [importCount, setImportCount] = useState(0)
   const headingRef = useRef(null)
   const errorRef = useRef(null)
   // What to focus after the next step change caused by a user action: null | 'heading' | 'error'
@@ -62,6 +66,7 @@ export default function TryApp() {
     setClearBlocked(false)
     setImportError(null)
     setData({ contacts, isSample, skipped })
+    setImportCount(n => n + 1)
     focusNext.current = 'heading'
     setStep('preview')
   }
@@ -162,7 +167,7 @@ export default function TryApp() {
               skipped={data.skipped}
             />
 
-            <p className="mt-8 text-sm leading-relaxed text-ink">Étape suivante : décrivez votre besoin.</p>
+            <RequestStep key={importCount} contacts={data.contacts} isSample={data.isSample} />
 
             <div className="mt-10 flex flex-col gap-6 border-t border-gray-100 pt-8 sm:flex-row sm:items-start sm:justify-between">
               <button type="button" onClick={handleReplace} className={`self-start text-sm ${LINK}`}>
