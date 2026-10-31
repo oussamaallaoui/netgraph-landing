@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 
 // ── Données ──────────────────────────────────────────────────────
 
@@ -427,11 +428,19 @@ export default function LandingPage() {
             </svg>
             <span className="font-semibold text-ink tracking-tight">NetGraph</span>
           </div>
-          <a href="#beta"
-            className="px-4 py-1.5 rounded-lg bg-violet text-white text-sm font-medium
-              hover:bg-violet-dark transition-colors">
-            Accès beta
-          </a>
+          <div className="flex items-center gap-4">
+            <Link href="/essayer"
+              className="whitespace-nowrap rounded text-sm font-medium text-violet hover:text-violet-dark underline-offset-2 hover:underline
+                focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">
+              <span className="sm:hidden">Essayer</span>
+              <span className="hidden sm:inline">Essayer maintenant</span>
+            </Link>
+            <a href="#beta"
+              className="whitespace-nowrap px-4 py-1.5 rounded-lg bg-violet text-white text-sm font-medium
+                hover:bg-violet-dark transition-colors">
+              Accès beta
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -467,6 +476,15 @@ export default function LandingPage() {
               </svg>
             </a>
             <p className="text-xs text-gray-400 mt-2">Gratuit · Aucune carte requise · Accès en 7 jours</p>
+            <Link href="/essayer"
+              className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium
+                text-violet hover:bg-violet-light transition-colors motion-reduce:transition-none
+                focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">
+              Essayer maintenant
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </Link>
           </div>
 
           {/* Sources */}

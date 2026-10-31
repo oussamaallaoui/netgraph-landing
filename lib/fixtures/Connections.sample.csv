@@ -1,0 +1,34 @@
+Notes:
+"Fictional sample file for NetGraph tests. Like a real LinkedIn export, it starts with notes, and email addresses are missing for connections who did not allow it, so the Email Address column is often empty."
+
+First Name,Last Name,URL,Email Address,Company,Position,Connected On
+Sara,Démo,https://www.linkedin.com/in/netgraph-exemple-s01,sara.demo@netgraph.test,Atlas Conseil,Directrice financière,12 Mar 2024
+Youssef,Exemple,https://www.linkedin.com/in/netgraph-exemple-s02,,ATLAS CONSEIL SA,Associé,02 Jun 2021
+Nadia,Fictif,https://www.linkedin.com/in/netgraph-exemple-s03,nadia.fictif@netgraph.test,Atlas Conseil,"Consultante senior, stratégie",20 Jan 2025
+Karim,Essai,https://www.linkedin.com/in/netgraph-exemple-s04,,Fictiva Banque,Directeur des risques,15 Sep 2020
+Hanane,Maquette,https://www.linkedin.com/in/netgraph-exemple-s05,hanane.maquette@netgraph.test,Fictiva Banque,Chargée d'affaires entreprises,03 Nov 2023
+Omar,Prototype,https://www.linkedin.com/in/netgraph-exemple-s06,,Démoventures,Partner – Venture Capital,28 Apr 2022
+Leïla,Pilote,https://www.linkedin.com/in/netgraph-exemple-s07,,Démoventures,Analyste investissement,07 Jul 2025
+Mehdi,Brouillon,https://www.linkedin.com/in/netgraph-exemple-s08,mehdi.brouillon@netgraph.test,Exemplia Audit,Manager audit financier,01 Dec 2019
+Salma,Témoin,https://www.linkedin.com/in/netgraph-exemple-s09,,Exemplia Audit,Responsable recrutement,19 Aug 2024
+Rachid,Factice,https://www.linkedin.com/in/netgraph-exemple-s10,rachid.factice@netgraph.test,Testiflow,CFO,14 Feb 2023
+Imane,Modèle,https://www.linkedin.com/in/netgraph-exemple-s11,,Testiflow,Fondatrice & CEO,10 Oct 2022
+Adam,Placebo,https://www.linkedin.com/in/netgraph-exemple-s12,adam.placebo@netgraph.test,Oasis Capital Démo,Directeur M&A,30 Mar 2021
+Yasmine,Simulé,https://www.linkedin.com/in/netgraph-exemple-s13,,Oasis Capital Démo,Chargée d'investissement private equity,05 May 2024
+Hamza,Fantôme,https://www.linkedin.com/in/netgraph-exemple-s14,,Medinova Démo,Responsable achats,22 Jan 2020
+Zineb,Sosie,https://www.linkedin.com/in/netgraph-exemple-s15,,Medinova Démo,Directrice des opérations,09 Sep 2025
+Anas,Figurant,https://www.linkedin.com/in/netgraph-exemple-s16,anas.figurant@netgraph.test,Cabinet Fictis,Consultant en transformation digitale,16 Jun 2023
+Ghita,Doublure,https://www.linkedin.com/in/netgraph-exemple-s17,ghita.doublure@netgraph.test,Cabinet Fictis,"Directrice associée, conseil en finance",12 Dec 2022
+Tarik,Mannequin,https://www.linkedin.com/in/netgraph-exemple-s18,,Assurances Exempla,Actuaire,11 Nov 2021
+Sofia,Prête-Nom,https://www.linkedin.com/in/netgraph-exemple-s19,,Assurances Exempla,Responsable partenariats,29 Feb 2024
+Ilyas,Cobaye,,ilyas.cobaye@netgraph.test,,Consultant indépendant en finance d'entreprise,15 Jan 2026
+Kenza,Échantillon,https://www.linkedin.com/in/netgraph-exemple-s21,,Université Démo,Professeure de finance,20 May 2019
+Badr,Silhouette,https://www.linkedin.com/in/netgraph-exemple-s22,,FICTIVA BANQUE,Head of Corporate Banking,01 Apr 2025
+Meryem,Avatar,https://www.linkedin.com/in/netgraph-exemple-s23,,Startup Lab Démo,Responsable incubation startups,27 Sep 2023
+Reda,Clone,https://www.linkedin.com/in/netgraph-exemple-s24,,Testiflow,Développeur full-stack,03 Mar 2026
+Aya,Gabarit,https://www.linkedin.com/in/netgraph-exemple-s25,,Logistica Démo,Supply chain manager,18 Jul 2022
+Nabil,Calque,https://www.linkedin.com/in/netgraph-exemple-s26,nabil.calque@netgraph.test,Logistica Démo,Directeur administratif et financier,30 Oct 2020
+Houda,Ébauche,,,Démoventures,Office manager,24 Dec 2024
+Amine,Esquisse,https://www.linkedin.com/in/netgraph-exemple-s28,,Cabinet Fictis,Senior Manager – Strategy & M&A,08 Aug 2021
+Lina,Spécimen,https://www.linkedin.com/in/netgraph-exemple-s29,,Exempla Média,Journaliste économique,02 Feb 2025
+Samir,Prétexte,https://www.linkedin.com/in/netgraph-exemple-s30,,Oasis Capital Démo SARL,Investment Director,14 Apr 2023
