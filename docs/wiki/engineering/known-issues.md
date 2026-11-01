@@ -1,6 +1,6 @@
 # Known issues
 
-As of 2026-10-27. Each item should have a GitHub issue; items without one are flagged for the PO to triage.
+As of 2026-11-01. Each item should have a GitHub issue; items without one are flagged for the PO to triage.
 
 ## Blocking
 
@@ -34,6 +34,16 @@ See [ADR 0001](../../adr/0001-local-first-contacts.md). These are accepted, not 
 - The browser may delete them (Safari after 7 days without visiting the site, low disk space, clearing site data). The user imports again.
 - If IndexedDB is unavailable (some private modes), contacts are kept only until the tab is closed.
 - The Vercel toolbar on preview deployments can't connect on `/essayer` because of its `connect-src 'self'` policy.
+
+## Introducers (#7, Sprint 2)
+
+Accepted limits of « Qui peut vous présenter chez … » (`lib/introducers.js`). Detection uses rules and the user's own file only: no fuzzy matching and no partial names this sprint.
+
+- **Partial company names show nothing.** « chez ATLAS » when the file has « Atlas Conseil », or « chez Oasis » for « Oasis Capital Démo »: there is no section and no « absent » notice (PO decision, 2026-11-01). The notice would contradict the #6 list, which matches the word « atlas ». Before that decision, these requests showed the notice. Opening the section on a partial name needs a separate backlog story (pending).
+- **A one-word generic company can't be named.** A company called only « Conseil » (one vocabulary word) is never detected in a request, even after « chez », because `buildIndex` doesn't make it mentionable. The user sees nothing, not a false notice. Multi-word generic names (« Finance Conseil ») work after a cue.
+- **A capitalised place after a role word reads as a company.** « DAF de Casablanca » shows « Aucune personne de votre réseau ne travaille chez Casablanca… ». Lowercase words (« DAF de la région », « responsable d'agence ») and « quelqu'un à Rabat » show nothing.
+- **#22 still affects the #6 list on the same screen.** A legal suffix typed in the request (« chez Oasis Capital Démo SARL ») gives the right introducer section, but the #6 results below rank and explain people by « SARL » (« son nom contient « SARL » »). Fix proposed in #22, not approved yet.
+- **Focus-mode announcement gap.** Focus moves to the first heading only after an example button, and no example request opens an introducer section or notice. So that path is never exercised with the #7 area: keyboard and screen-reader users who type their own request rely on the single `role="status"` message.
 
 ## Minor
 
