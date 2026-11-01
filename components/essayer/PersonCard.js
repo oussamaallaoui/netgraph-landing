@@ -1,8 +1,8 @@
 // Card for one person, shared by the #6 results (ResultCard) and the #7 introducers:
 // initials, name (h3), position, company as written in the file, the
 // « Pourquoi cette personne » box and the LinkedIn profile link when the stored URL is a
-// valid https LinkedIn URL. The « Préparer un message » action (#8) goes in `children`,
-// once, for both kinds of card; nothing is rendered there until #8 lands (no dead button).
+// valid https LinkedIn URL. The « Préparer un message » action (#8, DraftAction) goes in
+// `children`, passed by ResultCard (help) and IntroducersSection (intro).
 
 import { linkedInHref, initialsOf, WHY_LABEL } from './search'
 import { LINK } from './ui'
