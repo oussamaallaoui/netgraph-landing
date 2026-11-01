@@ -3,9 +3,10 @@
 // The introducer sentence itself (Introducer.why) comes from lib/explain.js introducerWhy().
 
 import { NO_RESULTS_TITLE, resultsSummary } from './search'
+import { MAX_INTRODUCERS } from '../../lib/introducers.js'
 
-/** Number of people the section lists at most (lib/introducers.js MAX_INTRODUCERS). */
-export const SHOWN_MAX = 20
+/** Number of people the section lists at most. */
+export const SHOWN_MAX = MAX_INTRODUCERS
 
 /** Above this length, the not-found notice no longer quotes the company as typed (PO §4). */
 export const NOTICE_LABEL_MAX = 40
