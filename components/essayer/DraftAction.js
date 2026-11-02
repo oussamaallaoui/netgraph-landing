@@ -6,7 +6,6 @@
 // back to the button. The text itself lives in RequestStep, so reopening shows the edits.
 
 import { useEffect, useId, useRef, useState } from 'react'
-import Arrow from './Arrow'
 import DraftEditor from './DraftEditor'
 import { useDrafts } from './DraftsContext'
 import { DRAFT_UI, prepareSrText } from './draftState'
@@ -51,7 +50,6 @@ export default function DraftAction({ contact, kind, companyLabel }) {
       >
         {DRAFT_UI.prepare}
         <span className="sr-only">{prepareSrText(contact)}</span>
-        <Arrow />
       </button>
       {open && <DraftEditor id={editorId} contact={contact} kind={kind} companyLabel={companyLabel} onClose={close} />}
     </div>

@@ -45,6 +45,16 @@ Accepted limits of « Qui peut vous présenter chez … » (`lib/introducers.js`
 - **#22 still affects the #6 list on the same screen.** A legal suffix typed in the request (« chez Oasis Capital Démo SARL ») gives the right introducer section, but the #6 results below rank and explain people by « SARL » (« son nom contient « SARL » »). Fix proposed in #22, not approved yet.
 - **Focus-mode announcement gap.** Focus moves to the first heading only after an example button, and no example request opens an introducer section or notice. So that path is never exercised with the #7 area: keyboard and screen-reader users who type their own request rely on the single `role="status"` message.
 
+## Drafts (#8, Sprint 2)
+
+Accepted limits of « Préparer un message » (`lib/drafts.js`, `components/essayer/DraftEditor.js`). NetGraph never sends anything: the user copies the text or opens their own app.
+
+- **`mailto:` links are capped at 2,000 characters.** Above that, `mailtoUrl` returns `null`: « Ouvrir dans votre messagerie » is hidden and the line « Ce message est trop long pour être ouvert dans votre messagerie… » tells the user to use « Copier ». Mail clients have different limits; the cap plus « Copier » covers them.
+- **« Objet » stays visible in the « trop long » case.** The field is shown whenever the contact has a valid email, not only when the link fits, so it never disappears (with the focus and the text) while the user types. Tech lead decision on PR #26, deviation from PO §5 pending PO confirmation.
+- **The Clipboard API needs https or localhost** and a user gesture. « Copier » calls it straight from the click, falls back to a hidden textarea + `document.execCommand('copy')`, and if both fail shows « La copie n'a pas fonctionné… » and selects the message so the user can copy it by hand.
+- **Open editors close on a new search.** The result cards remount and focus goes to the new results. The drafts themselves are kept: reopening shows the edited text; unedited drafts follow the new request.
+- **Drafts are lost on reload** (or a new import). They live only in React state (ADR 0001); the editor says so. Only the tone is kept (`localStorage` `netgraph:tone`).
+
 ## Minor
 
 - Some text is below 4.5:1 contrast: `gray-400` fine print and captions, and `signal` green text in the beta pill. See the design system's colour notes. (Backlog item "Corriger les contrastes insuffisants et l'année du pied de page", no issue yet.)

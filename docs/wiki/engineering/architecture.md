@@ -50,7 +50,11 @@ components/essayer/          client UI, one small component per file
   RequestForm.js             demande input + example requests
   ResultsList.js / ResultCard.js
   IntroducersSection.js
-  DraftEditor.js             tone, textarea, Copier / LinkedIn / email (/ WhatsApp)
+  DraftAction.js             « Préparer un message » button + inline editor toggle (#8)
+  DraftEditor.js             tone, subject, textarea, Copier / LinkedIn / messagerie (/ WhatsApp)
+  DraftsContext.js           draft state shared from RequestStep (edits per kind:contactId, tone)
+  draftState.js              pure draft helpers and editor copy (#8)
+  clipboard.js               copyText: Clipboard API, execCommand fallback
   importErrors.js            error code → French message
 lib/                         pure functions, no React, no DOM (except store.js)
   types.js                   JSDoc typedefs: Contact, MatchResult, …
@@ -62,7 +66,7 @@ lib/                         pure functions, no React, no DOM (except store.js)
   match.js                   buildIndex, match
   introducers.js             introducers
   explain.js                 « pourquoi » sentences from structured reasons
-  drafts.js                  draftMessage, mailtoUrl, linkedInUrl (+ whatsappUrl for #9)
+  drafts.js                  draftMessage, requestClause, linkedInProfileUrl, mailtoUrl, DRAFT_COPY, MAX_MAILTO_LENGTH (+ whatsappUrl for #9)
   store.js                   IndexedDB wrapper: loadContacts, saveContacts, clearAllData
   vcard.js, phone.js, merge.js   #9 stretch only
   fixtures/                  sample-contacts.js, Connections.sample.csv, reference-requests.js, synthetic.js
