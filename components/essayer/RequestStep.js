@@ -5,16 +5,23 @@
 // no-results screen. The request lives in this component's state only: it is never
 // put in the URL, stored, logged or sent anywhere. TryApp remounts this component
 // (key) on each import, and unmounts it when the data is cleared.
+// Drafts (#8): this component also owns the « Préparer un message » state, shared with
+// every editor through DraftsContext: a map `${kind}:${contact.id}` → only the edited
+// fields, kept while the page is open (a new search keeps it, a new import or a reload
+// drops it), and the tone preference, the only thing stored (localStorage netgraph:tone).
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import RequestForm from './RequestForm'
 import ResultsList from './ResultsList'
 import NoResults from './NoResults'
 import IntroducersSection from './IntroducersSection'
+import { DraftsContext } from './DraftsContext'
+import { normalizeTone } from './draftState'
 import { requestToSearch } from './search'
 import { searchAnnouncement } from './introducersCopy'
 import { buildIndex, match } from '../../lib/match.js'
 import { introducers } from '../../lib/introducers.js'
+import { getPreference, setPreference } from '../../lib/store.js'
 
 /** @typedef {import('../../lib/types.js').Contact} Contact */
 /** @typedef {import('../../lib/types.js').MatchResult} MatchResult */
@@ -33,7 +40,7 @@ export default function RequestStep({ contacts, isSample }) {
   const index = useMemo(() => buildIndex(contacts), [contacts])
   const [value, setValue] = useState('')
   const [showEmptyError, setShowEmptyError] = useState(false)
-  /** @type {[null | { results: MatchResult[], intro: IntroducersResult, id: number }, Function]} */
+  /** @type {[null | { results: MatchResult[], intro: IntroducersResult, request: string, id: number }, Function]} */
   const [search, setSearch] = useState(null)
   // Polite status text for screen readers; a trailing no-break space alternates so that
   // the same summary twice in a row is announced again.
@@ -45,6 +52,34 @@ export default function RequestStep({ contacts, isSample }) {
   // After the next search: 'focus' the first heading shown (example buttons, whose own
   // button disappears) or 'reveal' it (field / submit button keep the focus).
   const afterSearch = useRef(null)
+  /** @type {[Record<string, import('./draftState').DraftEdit>, Function]} */
+  const [drafts, setDrafts] = useState({})
+  const [preferredTone, setPreferredToneState] = useState('vous')
+
+  // Read after mount: the server render has no localStorage (same first render both sides).
+  useEffect(() => {
+    setPreferredToneState(normalizeTone(getPreference('tone')))
+  }, [])
+
+  const announce = useCallback((text) => {
+    setAnnouncement((prev) => (prev === text ? `${text}\u00a0` : text))
+  }, [])
+
+  const draftsApi = useMemo(
+    () => ({
+      request: search?.request ?? '',
+      preferredTone,
+      setPreferredTone(tone) {
+        const next = normalizeTone(tone)
+        setPreferredToneState(next)
+        setPreference('tone', next)
+      },
+      getEdit: (key) => drafts[key],
+      setEdit: (key, edit) => setDrafts((prev) => ({ ...prev, [key]: edit })),
+      announce,
+    }),
+    [search?.request, preferredTone, drafts, announce],
+  )
 
   useEffect(() => {
     if (!search || !afterSearch.current) return
@@ -74,7 +109,7 @@ export default function RequestStep({ contacts, isSample }) {
     const { results } = match(request, index)
     const intro = introducers(request, index)
     afterSearch.current = mode
-    setSearch((prev) => ({ results, intro, id: (prev?.id ?? 0) + 1 }))
+    setSearch((prev) => ({ results, intro, request, id: (prev?.id ?? 0) + 1 }))
     // Focusing the heading reads it out already: no live announcement then (said once).
     setAnnouncement((prev) => {
       if (mode === 'focus') return ''
@@ -94,7 +129,7 @@ export default function RequestStep({ contacts, isSample }) {
   }
 
   return (
-    <>
+    <DraftsContext.Provider value={draftsApi}>
       <section aria-labelledby="request-heading" className="mt-12 border-t border-gray-100 pt-10">
         <h2 id="request-heading" className="mb-2 text-2xl font-semibold leading-tight tracking-tight text-ink">
           Décrivez votre besoin
@@ -123,6 +158,6 @@ export default function RequestStep({ contacts, isSample }) {
       {search && search.results.length === 0 && (
         <NoResults key={search.id} onExample={handleExample} headingRef={headingRef} />
       )}
-    </>
+    </DraftsContext.Provider>
   )
 }

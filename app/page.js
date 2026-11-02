@@ -249,7 +249,7 @@ function AgentCard() {
           <button type="button" onClick={() => setSent(true)} disabled={sent}
             className="flex-1 px-6 py-3 rounded-xl bg-violet text-white text-sm font-medium
               hover:bg-violet-dark transition-colors disabled:opacity-60">
-            {sent ? 'Ouvert dans WhatsApp ✓' : 'Envoyer sur WhatsApp →'}
+            {sent ? 'Ouvert dans WhatsApp ✓' : 'Ouvrir dans WhatsApp →'}
           </button>
           <button type="button"
             className="px-6 py-3 rounded-xl border border-gray-200 bg-white text-ink text-sm font-medium

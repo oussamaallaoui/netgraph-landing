@@ -1,9 +1,11 @@
 // « Qui peut vous présenter chez … » (#7), between the request form and the #6 results.
 // found: h2, the count line and one card per person (sorted by lib/introducers.js);
+// each card offers « Préparer un message » (#8, introduction draft with the section label);
 // not_found: the PO notice, no person; no_company: nothing at all (the #6 screen is unchanged).
 // Copy: « Précisions PO Sprint 2 (2026-11-01) » on #7, in ./introducersCopy.js.
 
 import PersonCard from './PersonCard'
+import DraftAction from './DraftAction'
 import SampleBadge from './SampleBadge'
 import { introducersCountLine, introducersHeading, notFoundNotice } from './introducersCopy'
 
@@ -49,7 +51,9 @@ export default function IntroducersSection({ intro, isSample, focusRef }) {
       <ol className="mt-5 space-y-4">
         {intro.people.map(({ contact, why }) => (
           <li key={contact.id}>
-            <PersonCard contact={contact} why={why} />
+            <PersonCard contact={contact} why={why}>
+              <DraftAction contact={contact} kind="intro" companyLabel={intro.companyLabel} />
+            </PersonCard>
           </li>
         ))}
       </ol>
