@@ -13,7 +13,7 @@ import RequestStep from './RequestStep'
 import Arrow from './Arrow'
 import { importErrorMessage } from './importErrors'
 import { loadContacts, saveContacts, clearAllData } from '../../lib/store.js'
-import { FOCUS, LINK } from './ui'
+import { FOCUS, LINK, TOUCH } from './ui'
 
 /** @typedef {import('../../lib/types.js').Contact} Contact */
 
@@ -112,12 +112,12 @@ export default function TryApp() {
     <div className="min-h-screen bg-[#FAFAFA]">
       <header className="border-b border-gray-100 bg-white">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className={`flex items-center gap-2 rounded-lg ${FOCUS}`}>
+          <Link href="/" className={`flex min-h-[44px] items-center gap-2 rounded-lg ${FOCUS}`}>
             <Logo />
             <span className="font-semibold tracking-tight text-ink">NetGraph</span>
             <span className="sr-only">, retour à l&apos;accueil</span>
           </Link>
-          <Link href="/#beta" className={`inline-flex items-center gap-1 text-sm ${LINK}`}>
+          <Link href="/#beta" className={`${TOUCH} gap-1 text-sm ${LINK}`}>
             Rejoindre la beta <Arrow />
           </Link>
         </div>
@@ -170,7 +170,7 @@ export default function TryApp() {
             <RequestStep key={importCount} contacts={data.contacts} isSample={data.isSample} />
 
             <div className="mt-10 flex flex-col gap-6 border-t border-gray-100 pt-8 sm:flex-row sm:items-start sm:justify-between">
-              <button type="button" onClick={handleReplace} className={`self-start text-sm ${LINK}`}>
+              <button type="button" onClick={handleReplace} className={`${TOUCH} self-start text-sm ${LINK}`}>
                 Importer un autre fichier
               </button>
               <ClearDataButton
