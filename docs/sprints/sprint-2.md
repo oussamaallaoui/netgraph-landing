@@ -16,7 +16,7 @@
 | Story | Size | PR | Status | QA |
 | --- | --- | --- | --- | --- |
 | [#7 Voir qui peut me présenter dans une entreprise](https://github.com/oussamaallaoui/netgraph-landing/issues/7) | S | [#25](https://github.com/oussamaallaoui/netgraph-landing/pull/25) | **Livrée**, merged 2026-11-01 | **QA OK in production** ([verdict](https://github.com/oussamaallaoui/netgraph-landing/pull/25#issuecomment-6578218861)) |
-| [#8 Recevoir un message rédigé et l'envoyer moi-même](https://github.com/oussamaallaoui/netgraph-landing/issues/8) | M | [#26](https://github.com/oussamaallaoui/netgraph-landing/pull/26) | **Livrée**, merged 2026-11-02 | **En cours** (production) |
+| [#8 Recevoir un message rédigé et l'envoyer moi-même](https://github.com/oussamaallaoui/netgraph-landing/issues/8) | M | [#26](https://github.com/oussamaallaoui/netgraph-landing/pull/26) | **Livrée**, merged 2026-11-02 | **Partiel** (production, 2026-11-07): [QA partiel](https://github.com/oussamaallaoui/netgraph-landing/pull/26#issuecomment-6708873824) |
 | [#10 Protéger les données des inscrits à la beta](https://github.com/oussamaallaoui/netgraph-landing/issues/10) | S | — | **Non engagée**: never in the milestone, founder decision pending | — |
 
 ### #7 — Voir qui peut me présenter dans une entreprise
@@ -32,7 +32,7 @@
 - « Préparer un message » on every #6 result card (help draft) and every #7 introducer card (introduction draft naming the company). The draft can be edited and the tone switched (« Vous » / « Tu »). The hand-offs are « Copier », « Ouvrir le profil LinkedIn » and « Ouvrir dans votre messagerie ». « NetGraph n'envoie rien à votre place. C'est vous qui envoyez le message. » is always visible. **No element in NetGraph is labelled « Envoyer ».**
 - The landing page's demo card said « Envoyer sur WhatsApp → ». It now says « Ouvrir dans WhatsApp → » (fixed in PR #26).
 - Tech lead: changes requested, then [approved](https://github.com/oussamaallaoui/netgraph-landing/pull/26#issuecomment-6578307401) (470 tests passing).
-- QA: the [test plan](https://github.com/oussamaallaoui/netgraph-landing/issues/8#issuecomment-6578201536) was posted; the verdict in production is **en cours**.
+- QA: the [test plan](https://github.com/oussamaallaoui/netgraph-landing/issues/8#issuecomment-6578201536) was posted; the verdict in production is **partiel** ([QA partiel](https://github.com/oussamaallaoui/netgraph-landing/pull/26#issuecomment-6708873824)): every criterion passes in Chromium with no bug; still to check on the founder's own devices: real paste (Safari, Firefox, iOS, Android), the mail app opening, « Ouvrir le profil LinkedIn » in a new tab, and a real screen reader.
 - Accepted limits (wiki known-issues, « Drafts (#8, Sprint 2) »): `mailto:` capped at 2,000 characters, drafts lost on reload (only the tone is kept), open editors close on a new search, clipboard needs https.
 
 ### Confirmation PO : « Objet » dans le cas « trop long »
@@ -60,7 +60,7 @@ On https://netgraph-landing.vercel.app/essayer, with fake data only:
 - 2 stories committed (#7 S, #8 M), 2 shipped to production. #10 was never in the milestone.
 - **New branching:** one branch per story, both devs push to it, no stubs. That gave 2 PRs and 2 founder merges, instead of 6 code PRs in Sprint 1 (#15–#19, #24).
 - Dev work started before Monday: on GitHub, PR #25 was merged on 2026-11-01 and PR #26 on 2026-11-02, both before the official start on 2026-11-03.
-- Both PRs were merged by the founder **before QA's verdict**. QA then tested in production: #7 OK, #8 en cours. The tech lead's second approval on #26 is timestamped 2 seconds after the merge.
+- Both PRs were merged by the founder **before QA's verdict**. QA then tested in production: #7 OK, #8 partiel (no bug; real-device checks left to the founder). The tech lead's second approval on #26 is timestamped 2 seconds after the merge.
 - The founder interrupted the work twice (« stop »).
 - The 4 bugs filed in Sprint 1 (#20–#23) are still open. None was planned in Sprint 2.
 - Tests went from 323 (first review of #7) to 470 (approval of #8).
