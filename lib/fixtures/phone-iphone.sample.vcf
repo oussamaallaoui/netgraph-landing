@@ -1,0 +1,41 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//iPhone OS 18.0//EN
+N:Sara;Demo;;;
+FN:Demo Sara
+ORG:Atlas Conseil;
+TITLE:Directrice financière
+EMAIL;type=INTERNET;type=HOME;type=pref:demo.sara@netgraph.test
+item1.TEL;type=HOME:05 00 00 00 04
+item2.TEL;type=CELL;type=VOICE;type=pref:+212 6 00 00 00 04
+item2.X-ABLabel:_$!<Mobile>!$_
+ADR;type=HOME;type=pref:;;2 avenue Inventée;Rabat;;;Maroc
+NOTE:Rencontrée au salon fictif\, à recontacter
+PHOTO;ENCODING=b;TYPE=JPEG:/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/
+ wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q==
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+N:Exemple;You
+ ssef;;;
+FN:Youssef Exemple
+TEL;type=WORK:+33 6 00 00 00 05
+TEL;type=HOME:06 00 00 00 06
+EMAIL;type=INTERNET:pas-un-email
+EMAIL;type=INTERNET:youssef.exemple@netgraph.test
+BDAY:1985-05-05
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+N:;;;;
+FN:Nadia Fictif Bureau
+ORG:Fictiva\, Banque;Risques
+TEL;type=CELL:+33 6 00 00 00 10
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+N:Essai;Karim;;;
+FN:Karim Essai
+item1.TEL:+212600000011
+item1.X-ABLabel:Bureau
+END:VCARD

@@ -1,0 +1,19 @@
+BEGIN:VCARD
+VERSION:4.0
+FN:Tarik Mannequin
+N:Mannequin;Tarik;;;
+TEL;VALUE=uri;TYPE="cell,voice";PREF=1:tel:+212-600-000-007
+EMAIL;TYPE=work:tarik.mannequin@netgraph.test
+ORG:Démoventures
+TITLE:Chargé d'affaires
+END:VCARD
+begin:vcard
+version:4.0
+fn:Zineb Sosie
+n:Sosie;Zineb;;;
+tel;value=uri;type=home:tel:+212500000008
+BEGIN:VCARD
+VERSION:4.0
+FN:Sofia Prête-Nom
+N:Prête-Nom;Sofia;;;
+TEL;VALUE=uri;TYPE=work:tel:+212-600-000-012

@@ -55,6 +55,37 @@ Accepted limits of « Préparer un message » (`lib/drafts.js`, `components/essa
 - **Open editors close on a new search.** The result cards remount and focus goes to the new results. The drafts themselves are kept: reopening shows the edited text; unedited drafts follow the new request.
 - **Drafts are lost on reload** (or a new import). They live only in React state (ADR 0001); the editor says so. Only the tone is kept (`localStorage` `netgraph:tone`).
 
+## Phone import and WhatsApp (#9, Sprint 3)
+
+Accepted limits of the `.vcf` import and « Ouvrir dans WhatsApp » (`lib/vcard.js`, `lib/phone.js`, `lib/merge.js`, `whatsappUrl` in `lib/drafts.js`). The PO accepted them for this sprint (« Précisions PO Sprint 3 » §3 and §4 on #9); they are not bugs.
+
+**Merging a phone contact with a LinkedIn relation.** The rule: same name words in any order, ignoring accents, case and hyphens, at least two words, and **exactly one** person on each side. So:
+
+- **Spelling variants, transliterations and nicknames don't merge:** Mohamed / Mohammed, Youssef / Youssouf, « Yous ». A name in Arabic script on one side and Latin script on the other doesn't merge either.
+- **Extra words in the phone name don't merge:** « Sara Atlas », « Dr Karim Essai », « Karim Fictiva Banque », « Karim (Fictiva) », emojis. The person appears twice.
+- **One-word phone names never merge:** « Maman », « Karim ».
+- **Two people with the same name on one side:** none of them is merged for that name.
+- **Wrong merge (rare):** two different people with the same full name, one in each file, become one entry (LinkedIn position next to the phone number). The WhatsApp line asks the user to check the recipient before sending.
+- **No merge by email or by phone number** (LinkedIn exports rarely contain numbers).
+
+**Phone numbers.**
+
+- **A French number saved locally is read as Moroccan.** `06 12 34 56 78` saved without `+33` becomes `+212 6 12 34 56 78`: Morocco is the default country. Numbers saved with `+33` or `0033` are correct. The WhatsApp line asks the user to check the recipient.
+- Numbers that can't be read (too short, `08…`, 9 bare digits, extensions such as `p123` or `;ext=`) are dropped: the contact is imported without a number and without « Ouvrir dans WhatsApp ». The import says how many (« numéros non reconnus »).
+- When a contact has several numbers, only one is kept: the one typed mobile (`CELL`, `MOBILE`, `IPHONE`), else the first Moroccan mobile (`+2126…`, `+2127…`), else the first readable one. The user can't choose another number in NetGraph.
+- Two phone cards with the same number are one contact (the first is kept, the other counts as « en double »), even if the names differ (a shared office line, for example).
+
+**WhatsApp hand-off.**
+
+- **The `wa.me` link is capped at 2,000 characters** (`MAX_WHATSAPP_URL_LENGTH`). Above that, « Ouvrir dans WhatsApp » is hidden and the user is asked to use « Copier ». Accents and line breaks count several characters each once encoded. Platforms have different limits; 2,000 is conservative and may be raised after the real-device check.
+- The link carries one number and the message to WhatsApp (Meta), as any WhatsApp message would ([ADR 0001](../../adr/0001-local-first-contacts.md) §4). Nothing is sent until the user presses send in WhatsApp.
+
+**Storage (ADR 0002).**
+
+- **A rollback deletes the contacts.** A build from before #9 treats the new v2 record as unknown and deletes it: the user sees the import screen and imports again. Nothing leaks.
+- « Effacer mes données de cet appareil » deletes both sources at once. Removing only the phone contacts (or only LinkedIn) is not possible yet.
+- **Real exports:** the parser is tested on fictional Android (vCard 2.1), iPhone (3.0) and vCard 4.0 files built from the spec. Until the tech lead has checked the founder's real exports (task B6 on #9), unusual formats from some phones may import fewer contacts than expected.
+
 ## Minor
 
 - Some text is below 4.5:1 contrast: `gray-400` fine print and captions, and `signal` green text in the beta pill. See the design system's colour notes. (Backlog item "Corriger les contrastes insuffisants et l'année du pied de page", no issue yet.)

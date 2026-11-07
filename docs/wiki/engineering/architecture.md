@@ -12,9 +12,12 @@ Browser ──> Vercel (Next.js 14, App Router)
               └─ app/api/subscribe    POST: beta signup · GET: subscriber list (to remove, #10)
                     └─ subscribers.json   local file — doesn't work on Vercel (#11)
 
-Inside the browser, on /essayer (Sprint 1):
-  Connections.csv ──> lib/linkedin.js ──> Contact[] ──> lib/store.js (IndexedDB, this device only)
-  demande ──> lib/match.js + lib/introducers.js ──> results + « pourquoi » ──> lib/drafts.js ──> copy / mailto / LinkedIn profile
+Inside the browser, on /essayer (Sprint 1, phone contacts since #9):
+  Connections.csv ──> lib/linkedin.js ──────────────┐
+  contacts .vcf ────> lib/vcard.js (+ lib/phone.js) ─┴─> lib/merge.js withImport ──> lib/store.js (IndexedDB, this device only:
+                                                        one list per source, ADR 0002)
+  lib/store.js loadContacts ──> lib/merge.js combineSources ──> Contact[] (one entry per merged person)
+  demande ──> lib/match.js + lib/introducers.js ──> results + « pourquoi » ──> lib/drafts.js ──> copy / WhatsApp (wa.me) / LinkedIn profile / mailto
   Nothing about contacts or requests is sent to any server.
 ```
 
@@ -27,7 +30,7 @@ Inside the browser, on /essayer (Sprint 1):
 Decision record: [ADR 0001](../../adr/0001-local-first-contacts.md). In short:
 
 - Contacts are parsed, matched and stored **only in the browser**. No server route receives contacts or requests; no analytics or error reporting on `/essayer`; no `console.*` with contact data.
-- **Storage:** IndexedDB (`netgraph` database, `kv` store, key `contacts`), one record replaced on each import. Requests, results and drafts are not persisted. UI preferences only may go in `localStorage` under `netgraph:*`.
+- **Storage:** IndexedDB (`netgraph` database, `kv` store, key `contacts`), one record. Since #9 it is **v2** ([ADR 0002](../../adr/0002-contacts-record-v2-per-source.md)): one list per source (`sample`, or `linkedin` and/or `phone`); importing a source replaces that source only, and the lists are merged on every load by `combineSources`. v1 records (Sprints 1–2) are migrated to v2 on load and written back; a rollback to a pre-#9 build deletes a v2 record (the user imports again). Requests, results and drafts are not persisted. UI preferences only may go in `localStorage` under `netgraph:*`.
 - **Deletion:** « Effacer mes données de cet appareil » deletes the IndexedDB database and the `netgraph:*` keys.
 - **Guard rail:** `/essayer` is served with `Content-Security-Policy: connect-src 'self'` and `Referrer-Policy: no-referrer` (set in `next.config.js` `headers()`), served on every route (`/:path*`) so client-side navigation from `/` keeps it. Side effect: the Vercel toolbar on preview deployments can't connect on any page; that's expected, and QA ignores `vercel.live` CSP violations on previews only.
 - **Hand-offs** (`mailto:`, LinkedIn profile, `wa.me` for #9) are user-triggered navigations to the user's own apps; nothing is sent by NetGraph.
@@ -66,10 +69,14 @@ lib/                         pure functions, no React, no DOM (except store.js)
   match.js                   buildIndex, match
   introducers.js             introducers
   explain.js                 « pourquoi » sentences from structured reasons
-  drafts.js                  draftMessage, requestClause, linkedInProfileUrl, mailtoUrl, DRAFT_COPY, MAX_MAILTO_LENGTH (+ whatsappUrl for #9)
-  store.js                   IndexedDB wrapper: loadContacts, saveContacts, clearAllData
-  vcard.js, phone.js, merge.js   #9 stretch only
-  fixtures/                  sample-contacts.js, Connections.sample.csv, reference-requests.js, synthetic.js
+  drafts.js                  draftMessage, requestClause, linkedInProfileUrl, mailtoUrl, DRAFT_COPY, MAX_MAILTO_LENGTH,
+                             whatsappUrl, MAX_WHATSAPP_URL_LENGTH (#9)
+  store.js                   IndexedDB wrapper: loadContacts (v1 → v2 migration), saveContacts(record), clearAllData
+  phone.js                   normalizePhone → E.164, Morocco by default (#9)
+  vcard.js                   isVCardText, parseVCard: Android 2.1, iPhone 3.0, vCard 4.0 (#9)
+  merge.js                   withImport, combineSources, nameKey: one list per source, merged on read (#9)
+  fixtures/                  sample-contacts.js, Connections.sample.csv, phone-{android,iphone,v4}.sample.vcf,
+                             reference-requests.js, synthetic.js
 ```
 
 `lib/` is owned by dev-backend (it is the "imports, matching, agent logic" of `docs/TEAM.md`, running client-side); `components/` and `app/essayer/` by dev-frontend. The function signatures and data shapes between them are the **contracts** posted on issues #5–#9; changing one needs both devs and the tech lead.
@@ -78,7 +85,7 @@ lib/                         pure functions, no React, no DOM (except store.js)
 
 - **Runner:** [Vitest](https://vitest.dev/) **3.x** (`vitest@^3.2`), dev dependency, `npm test` = `vitest run`. Vitest 4+ requires Node 22; we are on Node 20 (`.nvmrc`), so stay on 3.x until we move Node.
 - **Scope:** unit tests for everything in `lib/`, next to the code (`lib/match.test.js`). `lib/store.js` is tested with `fake-indexeddb` (dev dependency) so the deletion path is checked automatically. No component tests this sprint (no jsdom/Testing Library): UI is checked by QA on the preview.
-- **Quality bar for matching:** `lib/match.reference.test.js` runs every request in `lib/fixtures/reference-requests.js` against the sample contacts and fails if an expected person is missing from the top 3. A 5,000-contact synthetic set checks the time budget.
+- **Quality bar for matching:** `lib/match.reference.test.js` runs every request in `lib/fixtures/reference-requests.js` against the sample contacts and fails if an expected person is missing from the top 3. A 5,000-contact synthetic set checks the time budget; `lib/merge.test.js` checks that 30,000 LinkedIn + 5,000 phone contacts merge in under 200 ms.
 - **Set up on day 1 by dev-backend** in a small `chore/test-setup` PR (Vitest, `npm test`, shared fixtures, `lib/types.js`). It changes nothing visible on production, so the founder can merge it the same day and both devs branch from it.
 
 ## Dependencies
