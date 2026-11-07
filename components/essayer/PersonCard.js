@@ -5,7 +5,8 @@
 // `children`, passed by ResultCard (help) and IntroducersSection (intro).
 
 import { linkedInHref, initialsOf, WHY_LABEL } from './search'
-import { LINK } from './ui'
+import { ofName } from './format'
+import { LINK, TOUCH } from './ui'
 
 /**
  * @param {object} props
@@ -43,10 +44,10 @@ export default function PersonCard({ contact, why, children }) {
       </div>
 
       {href && (
-        <p className="mt-3 text-sm">
-          <a href={href} target="_blank" rel="noopener noreferrer" className={LINK}>
+        <p className="mt-1 text-sm">
+          <a href={href} target="_blank" rel="noopener noreferrer" className={`${TOUCH} ${LINK}`}>
             Voir le profil LinkedIn
-            <span className="sr-only"> de {contact.fullName} (nouvel onglet)</span>
+            <span className="sr-only">{` ${ofName(contact.fullName)} (nouvel onglet)`}</span>
           </a>
         </p>
       )}

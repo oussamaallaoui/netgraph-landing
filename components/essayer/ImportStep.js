@@ -1,6 +1,6 @@
 'use client'
-// Import step: how to get the LinkedIn export, the on-device promise, a drop
-// zone with a labelled file input, and the sample-data button.
+// Import step: the on-device promise (under the intro, #20), how to get the LinkedIn
+// export, a drop zone with a labelled file input, and the sample-data button.
 // Copy: final PO wording (#5 comment 2026-10-29).
 
 import { useEffect, useId, useState } from 'react'
@@ -8,7 +8,7 @@ import { importFile } from './importFile'
 import { importErrorMessage } from './importErrors'
 import { SAMPLE_CONTACTS } from '../../lib/fixtures/sample-contacts.js'
 import Arrow from './Arrow'
-import { BUTTON_SECONDARY, LINK } from './ui'
+import { BUTTON_SECONDARY, LINK, TOUCH } from './ui'
 
 const LINKEDIN_EXPORT_URL = 'https://www.linkedin.com/mypreferences/d/download-my-data'
 
@@ -92,10 +92,24 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
       >
         Importez vos relations LinkedIn
       </h1>
-      <p className="mb-8 max-w-xl text-base leading-relaxed text-slate">
+      <p className="mb-6 max-w-xl text-base leading-relaxed text-slate">
         NetGraph cherche dans votre réseau les personnes qui peuvent vous aider. Commencez par le fichier
         de vos relations LinkedIn.
       </p>
+
+      {/* The on-device promise (exact wording from the #5 criteria). Shown once, right under the
+          intro and before the steps, drop zone and sample button, so it is above the fold (#20). */}
+      <div className="mb-8 flex max-w-xl items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 sm:p-5">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-light text-violet">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+            <rect x="4" y="9" width="12" height="8" rx="2" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M7 9V6.5a3 3 0 0 1 6 0V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </span>
+        <p className="text-sm font-semibold leading-relaxed text-ink">
+          Vos contacts restent sur cet appareil : ils ne sont jamais envoyés à NetGraph.
+        </p>
+      </div>
 
       <div className="grid gap-8 md:grid-cols-[1fr_1.1fr]">
         {/* How to get the file */}
@@ -114,24 +128,11 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
               </li>
             ))}
           </ol>
-          <p className="mt-4 text-sm">
-            <a href={LINKEDIN_EXPORT_URL} target="_blank" rel="noopener noreferrer" className={LINK}>
+          <p className="mt-2 text-sm">
+            <a href={LINKEDIN_EXPORT_URL} target="_blank" rel="noopener noreferrer" className={`${TOUCH} ${LINK}`}>
               Ouvrir la page d&apos;export de LinkedIn<span className="sr-only"> (nouvel onglet)</span>
             </a>
           </p>
-
-          {/* The on-device promise (exact wording from the acceptance criteria), right after the steps */}
-          <div className="mt-6 flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-4 sm:p-5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-light text-violet">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
-                <rect x="4" y="9" width="12" height="8" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M7 9V6.5a3 3 0 0 1 6 0V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            </span>
-            <p className="text-sm font-semibold leading-relaxed text-ink">
-              Vos contacts restent sur cet appareil : ils ne sont jamais envoyés à NetGraph.
-            </p>
-          </div>
         </div>
 
         {/* Drop zone + labelled file input */}
@@ -197,8 +198,8 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
           </div>
 
           {onCancel && (
-            <p className="mt-6 text-sm">
-              <button type="button" onClick={onCancel} className={LINK}>
+            <p className="mt-4 text-sm">
+              <button type="button" onClick={onCancel} className={`${TOUCH} ${LINK}`}>
                 Revenir à mes relations importées
               </button>
             </p>
