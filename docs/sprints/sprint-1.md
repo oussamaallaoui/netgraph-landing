@@ -294,3 +294,15 @@ En tant que testeur de la beta, je veux créer un compte et me connecter afin d'
 - Supprimer mon compte et tous mes contacts importés (once anything is stored server-side)
 - Recevoir un email de confirmation après l'inscription à la beta, avec anti-spam du formulaire
 - Corriger les contrastes insuffisants et l'année du pied de page
+
+---
+
+## Clôture (2026-11-07)
+
+Closed together with Sprint 2, with the founder's approval. This replaces the placeholder « Demo » and « Retro » sections above. The demo script was run in Sprint 2 (see [Sprint 2](sprint-2.md)).
+
+- **Shipped:** #5 Importer mes relations LinkedIn sur mon appareil (PRs #15, #16, #18) and #6 Décrire mon besoin et voir qui peut m'aider (PRs #17, #19, #24), merged on 2026-10-31.
+- **Carried over to Sprint 2 and shipped there:** #7 (PR #25) and #8 (PR #26).
+- **Not started:** #9 (stretch). The mid-sprint gate didn't pass, so it goes back to the backlog and is proposed for Sprint 3.
+- **Bugs filed during the sprint, still open:** #20, #21, #22, #23.
+- **Retro:** merged into the Sprint 2 retro. PO reading: 4 stories plus a stretch was more than one week allowed (2 shipped). Sprint 2 committed fewer stories and used one branch per story.
