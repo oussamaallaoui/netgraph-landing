@@ -1,7 +1,8 @@
 'use client'
-// Preview after an import: count, skipped rows, sample badge, first 10 rows.
+// Preview after an import: count, status lines of the import just done (#9 PO §6),
+// sample badge, first 10 rows (Nom / Poste / Entreprise: phone numbers are never shown).
 
-import { importedLabel, skippedLabel, formatNumber } from './format'
+import { previewCaption, previewHeading, previewNote } from './importCopy'
 import { FOCUS } from './ui'
 import SampleBadge from './SampleBadge'
 
@@ -17,7 +18,14 @@ function Cell({ value }) {
   )
 }
 
-export default function ContactPreview({ headingRef, contacts, isSample, skipped }) {
+/**
+ * @param {object} props
+ * @param {import('../../lib/types.js').Contact[]} props.contacts  the merged list
+ * @param {boolean} props.isSample
+ * @param {boolean} props.hasPhone      phone contacts are stored
+ * @param {string[]} props.statusLines  from importStatusLines(), empty after a reload
+ */
+export default function ContactPreview({ headingRef, contacts, isSample, hasPhone, statusLines }) {
   const rows = contacts.slice(0, PREVIEW_ROWS)
 
   return (
@@ -32,18 +40,14 @@ export default function ContactPreview({ headingRef, contacts, isSample, skipped
           tabIndex={-1}
           className="text-3xl font-semibold leading-tight tracking-tight text-ink focus:outline-none sm:text-4xl"
         >
-          {importedLabel(contacts.length)}
+          {previewHeading(contacts.length, hasPhone)}
         </h1>
-        {skipped > 0 && (
-          <p className="mt-2 text-sm text-slate">
-            {skippedLabel(skipped)}
+        {statusLines.map((line) => (
+          <p key={line} className="mt-2 text-sm leading-relaxed text-slate">
+            {line}
           </p>
-        )}
-        <p className="mt-3 text-sm leading-relaxed text-slate">
-          {isSample
-            ? 'Exemple de démonstration : noms et entreprises fictifs. Ils sont enregistrés sur cet appareil uniquement.'
-            : 'Elles sont enregistrées sur cet appareil uniquement.'}
-        </p>
+        ))}
+        <p className="mt-3 text-sm leading-relaxed text-slate">{previewNote({ isSample, hasPhone })}</p>
       </div>
 
       <div
@@ -54,9 +58,7 @@ export default function ContactPreview({ headingRef, contacts, isSample, skipped
       >
         <table className="w-full border-collapse text-left text-sm">
           <caption id="preview-caption" className="px-4 pb-2 pt-4 text-left text-sm font-medium text-ink sm:px-5">
-            {contacts.length > PREVIEW_ROWS
-              ? `Aperçu : les ${PREVIEW_ROWS} premières relations sur ${formatNumber(contacts.length)}`
-              : 'Aperçu de vos relations'}
+            {previewCaption(contacts.length, PREVIEW_ROWS, hasPhone)}
           </caption>
           <thead>
             <tr className="border-b border-gray-100 text-xs uppercase tracking-wide text-slate">
