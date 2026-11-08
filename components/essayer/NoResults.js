@@ -28,7 +28,7 @@ export default function NoResults({ onExample, headingRef }) {
             <button
               type="button"
               onClick={() => onExample(example)}
-              className={`w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-left text-sm font-medium text-violet
+              className={`w-full rounded-xl border border-gray-200 bg-white min-h-[44px] px-4 py-3 text-left text-sm font-medium text-violet
                 transition-colors duration-150 hover:border-violet hover:bg-violet-light motion-reduce:transition-none
                 sm:w-auto ${FOCUS}`}
             >

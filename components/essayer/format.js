@@ -21,3 +21,21 @@ export function skippedLabel(n) {
     ? `${formatNumber(n)} ligne ignorée (sans nom ou en double)`
     : `${formatNumber(n)} lignes ignorées (sans nom ou en double)`
 }
+
+/**
+ * « d'Anas Figurant » / « de Sara Démo »: French elision before a name, for the
+ * screen-reader part of « Voir le profil LinkedIn » (#23).
+ * « d' » when the trimmed name starts with a, e, i, o or u, any case, with or without
+ * an accent (« d'Élodie », « d'émilie »). « de » otherwise: consonants, h and y
+ * (« de Hamza », « de Yasmine », PO decision), a digit, an emoji, a quote, or no name.
+ * Straight apostrophe, no space after it, like the rest of the /essayer copy.
+ * @param {string} name
+ * @returns {string}
+ */
+export function ofName(name) {
+  const trimmed = String(name ?? '').trim()
+  // NFD splits « É » into « E » + combining accent, so the first code unit is the base letter.
+  const first = trimmed.normalize('NFD').charAt(0)
+  if (/^[aeiou]$/i.test(first)) return `d'${trimmed}`
+  return trimmed ? `de ${trimmed}` : 'de'
+}
