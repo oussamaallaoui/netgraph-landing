@@ -156,7 +156,7 @@ export default function DraftEditor({ id, contact, kind, companyLabel, onClose }
           {TONES.map((tone) => (
             <label
               key={tone}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-ink
+              className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-ink
                 transition-colors duration-150 hover:border-violet motion-reduce:transition-none
                 has-[:checked]:border-violet has-[:checked]:bg-violet-light has-[:focus-visible]:outline
                 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-violet"

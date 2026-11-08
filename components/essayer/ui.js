@@ -2,6 +2,10 @@
 // violet for actions, radius-xl (12px) buttons, 2px violet focus outline 2px out,
 // colour transitions only, switched off under prefers-reduced-motion.
 
+// Tap area at least 44 px high (#21) for a standalone link or text button, without
+// changing how it looks: the box grows, the text stays the same size.
+export const TOUCH = 'inline-flex min-h-[44px] items-center'
+
 export const FOCUS =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet'
 

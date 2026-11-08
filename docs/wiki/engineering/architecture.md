@@ -9,7 +9,7 @@ Browser ──> Vercel (Next.js 14, App Router)
               ├─ app/page.js          landing page (client component)
               ├─ app/layout.js        metadata, global CSS
               ├─ app/essayer/         Sprint 1: import → request → results → draft (client-side only)
-              └─ app/api/subscribe    POST: beta signup · GET: subscriber list (to remove, #10)
+              └─ app/api/subscribe    POST: beta signup (GET removed, #10)
                     └─ subscribers.json   local file — doesn't work on Vercel (#11)
 
 Inside the browser, on /essayer (Sprint 1, phone contacts since #9):
