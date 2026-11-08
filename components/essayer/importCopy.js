@@ -22,6 +22,18 @@ export function previewHeading(total, hasPhone) {
   return hasPhone ? contactsImportedLabel(total) : importedLabel(total)
 }
 
+/** Import step link back to the preview (PO decision on PR #30: « contacts » once phone contacts are stored). */
+export function backToImportedLabel(hasPhone) {
+  return hasPhone ? 'Revenir à mes contacts importés' : 'Revenir à mes relations importées'
+}
+
+/** « Effacer mes données » confirmation (PO decision on PR #30). */
+export function clearConfirmText(hasPhone) {
+  return hasPhone
+    ? 'Effacer vos contacts de cet appareil ? Cette action est définitive.'
+    : 'Effacer vos relations de cet appareil ? Cette action est définitive.'
+}
+
 /** The line under the h1 (sample / phone present / LinkedIn only). */
 export function previewNote({ isSample, hasPhone }) {
   if (isSample) return 'Exemple de démonstration : noms et entreprises fictifs. Ils sont enregistrés sur cet appareil uniquement.'

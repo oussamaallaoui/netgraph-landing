@@ -7,6 +7,7 @@
 import { useEffect, useId, useState } from 'react'
 import { importFile } from './importFile'
 import { importErrorMessage, MAX_FILE_MB } from './importErrors'
+import { backToImportedLabel } from './importCopy'
 import { SAMPLE_CONTACTS } from '../../lib/fixtures/sample-contacts.js'
 import Arrow from './Arrow'
 import { BUTTON_SECONDARY, LINK, TOUCH } from './ui'
@@ -47,8 +48,9 @@ const PHONE_STEPS = [
  *   previous import exists: the parent shows the error above the previous preview instead of here
  * @param {(() => void) | null} [props.onCancel]
  * @param {string | null} [props.notice]  announced once after mount (e.g. after deletion)
+ * @param {boolean} [props.hasPhone]  phone contacts are stored: the back link says « contacts »
  */
-export default function ImportStep({ headingRef, onImported, onError, onCancel, notice }) {
+export default function ImportStep({ headingRef, onImported, onError, onCancel, notice, hasPhone = false }) {
   const inputId = useId()
   const hintId = useId()
   const [busy, setBusy] = useState(null) // null | 'file' | 'sample'
@@ -238,7 +240,7 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
           {onCancel && (
             <p className="mt-4 text-sm">
               <button type="button" onClick={onCancel} className={`${TOUCH} ${LINK}`}>
-                Revenir à mes relations importées
+                {backToImportedLabel(hasPhone)}
               </button>
             </p>
           )}

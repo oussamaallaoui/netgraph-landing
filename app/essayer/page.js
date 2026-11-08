@@ -5,7 +5,7 @@ import TryApp from '../../components/essayer/TryApp'
 export const metadata = {
   title: 'Essayer NetGraph',
   description:
-    'Importez vos relations LinkedIn et essayez NetGraph. Vos contacts restent sur cet appareil : ils ne sont jamais envoyés à NetGraph.',
+    'Importez vos relations LinkedIn ou les contacts de votre téléphone, et essayez NetGraph. Vos contacts restent sur cet appareil : ils ne sont jamais envoyés à NetGraph.',
   referrer: 'no-referrer',
 }
 

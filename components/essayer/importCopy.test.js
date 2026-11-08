@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
+  backToImportedLabel,
+  clearConfirmText,
   contactsImportedLabel,
   importStatusLines,
   lastImportOf,
@@ -32,6 +34,18 @@ describe('previewHeading (PO §6)', () => {
     expect(previewNote({ isSample: false, hasPhone: true })).toBe('Ils sont enregistrés sur cet appareil uniquement.')
     expect(previewNote({ isSample: false, hasPhone: false })).toBe('Elles sont enregistrées sur cet appareil uniquement.')
     expect(previewNote({ isSample: true, hasPhone: false })).toMatch(/^Exemple de démonstration/)
+  })
+})
+
+describe('« relations » / « contacts » labels (PO decision on PR #30)', () => {
+  it('LinkedIn only: « relations »', () => {
+    expect(backToImportedLabel(false)).toBe('Revenir à mes relations importées')
+    expect(clearConfirmText(false)).toBe('Effacer vos relations de cet appareil ? Cette action est définitive.')
+  })
+
+  it('LinkedIn + phone: « contacts »', () => {
+    expect(backToImportedLabel(true)).toBe('Revenir à mes contacts importés')
+    expect(clearConfirmText(true)).toBe('Effacer vos contacts de cet appareil ? Cette action est définitive.')
   })
 })
 

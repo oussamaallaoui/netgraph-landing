@@ -7,13 +7,15 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { BUTTON_DANGER, BUTTON_DANGER_OUTLINE, BUTTON_SECONDARY } from './ui'
+import { clearConfirmText } from './importCopy'
 
 /**
  * @param {object} props
  * @param {() => Promise<{ cleared: boolean }>} props.onClear
  * @param {string | null} [props.error]
+ * @param {boolean} [props.hasPhone]  phone contacts are stored: the confirmation says « contacts »
  */
-export default function ClearDataButton({ onClear, error }) {
+export default function ClearDataButton({ onClear, error, hasPhone = false }) {
   const [confirming, setConfirming] = useState(false)
   const [busy, setBusy] = useState(false)
   const cancelRef = useRef(null)
@@ -61,7 +63,7 @@ export default function ClearDataButton({ onClear, error }) {
           onKeyDown={e => { if (e.key === 'Escape' && !busy) cancel() }}
         >
           <p id="clear-confirm-text" className="mb-4 text-sm leading-relaxed text-ink">
-            Effacer vos relations de cet appareil ? Cette action est définitive.
+            {clearConfirmText(hasPhone)}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={confirm} disabled={busy} className={BUTTON_DANGER}>

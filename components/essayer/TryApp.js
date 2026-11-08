@@ -5,7 +5,7 @@
 // merged list shown, matched and drafted from. Contacts live in React state and in lib/store.js
 // (IndexedDB, this device only). Nothing here sends, logs or tracks contact data.
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Logo from '../Logo'
 import ImportStep from './ImportStep'
@@ -29,11 +29,15 @@ export default function TryApp() {
   const [step, setStep] = useState('loading')
   // The stored record (v2, one list per source, ADR 0002). The merged list is derived from it.
   /** @type {[import('../../lib/types.js').StoredContacts | null, Function]} */
-  const [record, setRecord] = useState(null)
+  // Kept with its merged list, so combineSources (≈100 ms for 30k + 5k contacts) runs once
+  // per record change: in the load or import handler, never again on render.
+  /** @type {[null | { record: import('../../lib/types.js').StoredContacts, combined: { contacts: Contact[], merged: number } }, Function]} */
+  const [stored, setStored] = useState(null)
+  const record = stored?.record ?? null
+  const hasPhone = recordHasPhone(record)
   /** The import just done in this visit, for the status lines (null after a reload). */
   const [lastImport, setLastImport] = useState(null)
-  const combined = useMemo(() => combineSources(record), [record])
-  const data = record && combined.contacts.length > 0 ? combined : null
+  const data = stored && stored.combined.contacts.length > 0 ? stored.combined : null
   const [persisted, setPersisted] = useState(true)
   const [cleared, setCleared] = useState(false)
   const [clearBlocked, setClearBlocked] = useState(false)
@@ -49,10 +53,11 @@ export default function TryApp() {
 
   useEffect(() => {
     let active = true
-    loadContacts().then(stored => {
+    loadContacts().then(loaded => {
       if (!active) return
-      if (stored && combineSources(stored).contacts.length > 0) {
-        setRecord(stored)
+      const combined = loaded ? combineSources(loaded) : null
+      if (combined && combined.contacts.length > 0) {
+        setStored({ record: loaded, combined })
         setStep('preview')
       } else {
         setStep('import')
@@ -76,9 +81,10 @@ export default function TryApp() {
     setCleared(false)
     setClearBlocked(false)
     setImportError(null)
-    setRecord(next)
+    const combined = combineSources(next)
+    setStored({ record: next, combined })
     setLastImport(
-      lastImportOf(next, { source, imported: contacts.length, skipped, unrecognizedPhones, merged: combineSources(next).merged }),
+      lastImportOf(next, { source, imported: contacts.length, skipped, unrecognizedPhones, merged: combined.merged }),
     )
     setImportCount(n => n + 1)
     focusNext.current = 'heading'
@@ -100,7 +106,7 @@ export default function TryApp() {
       setClearBlocked(true)
       return { cleared: false }
     }
-    setRecord(null)
+    setStored(null)
     setLastImport(null)
     setPersisted(true)
     setImportError(null)
@@ -151,6 +157,7 @@ export default function TryApp() {
             onImported={handleImported}
             onError={data ? handleImportErrorWithPrevious : null}
             onCancel={data ? handleCancelReplace : null}
+            hasPhone={hasPhone}
             notice={cleared ? CLEARED_MESSAGE : null}
           />
         )}
@@ -179,7 +186,7 @@ export default function TryApp() {
               headingRef={headingRef}
               contacts={data.contacts}
               isSample={record.isSample}
-              hasPhone={recordHasPhone(record)}
+              hasPhone={hasPhone}
               statusLines={importStatusLines(lastImport)}
             />
 
@@ -191,6 +198,7 @@ export default function TryApp() {
               </button>
               <ClearDataButton
                 onClear={handleClear}
+                hasPhone={hasPhone}
                 error={clearBlocked ? CLEAR_BLOCKED_MESSAGE : null}
               />
             </div>
