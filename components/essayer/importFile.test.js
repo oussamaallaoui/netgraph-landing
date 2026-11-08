@@ -10,7 +10,26 @@ const ANDROID = fixture('phone-android.sample.vcf')
 const IPHONE = fixture('phone-iphone.sample.vcf')
 const V4 = fixture('phone-v4.sample.vcf')
 
-const fakeFile = (name, text, size = text.length) => ({ name, size, text: async () => text })
+// File-like objects with arrayBuffer() only (#31: importFile never calls file.text()).
+const bytesFile = (name, bytes, size = bytes.byteLength) => ({
+  name,
+  size,
+  arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+})
+const fakeFile = (name, text, size) => {
+  const bytes = new TextEncoder().encode(text)
+  return bytesFile(name, bytes, size ?? bytes.byteLength)
+}
+const concat = (...parts) => {
+  const arrays = parts.map((p) => (typeof p === 'string' ? new TextEncoder().encode(p) : Uint8Array.from(p)))
+  const out = new Uint8Array(arrays.reduce((n, a) => n + a.length, 0))
+  let i = 0
+  for (const a of arrays) {
+    out.set(a, i)
+    i += a.length
+  }
+  return out
+}
 
 describe('extensionOf / sourceFromName', () => {
   it('reads the last extension, lowercased', () => {
@@ -44,19 +63,19 @@ describe('detectSource (content → extension)', () => {
 
 describe('importFile', () => {
   it('rejects a file over 50 MB without reading it, with the source guessed from the name', async () => {
-    const text = vi.fn()
+    const arrayBuffer = vi.fn()
     expect(MAX_FILE_BYTES).toBe(50 * 1024 * 1024)
-    expect(await importFile({ name: 'Contacts.vcf', size: MAX_FILE_BYTES + 1, text })).toEqual({
+    expect(await importFile({ name: 'Contacts.vcf', size: MAX_FILE_BYTES + 1, arrayBuffer })).toEqual({
       ok: false,
       code: 'FILE_TOO_LARGE',
       source: 'phone',
     })
-    expect(await importFile({ name: 'Connections.csv', size: MAX_FILE_BYTES + 1, text })).toEqual({
+    expect(await importFile({ name: 'Connections.csv', size: MAX_FILE_BYTES + 1, arrayBuffer })).toEqual({
       ok: false,
       code: 'FILE_TOO_LARGE',
       source: 'linkedin',
     })
-    expect(text).not.toHaveBeenCalled()
+    expect(arrayBuffer).not.toHaveBeenCalled()
   })
 
   it('accepts a file of exactly 50 MB', async () => {
@@ -65,7 +84,7 @@ describe('importFile', () => {
   })
 
   it('returns READ_FAILED when the file cannot be read or is missing', async () => {
-    const out = await importFile({ name: 'a.vcf', size: 10, text: () => Promise.reject(new Error('nope')) })
+    const out = await importFile({ name: 'a.vcf', size: 10, arrayBuffer: () => Promise.reject(new Error('nope')) })
     expect(out).toEqual({ ok: false, code: 'READ_FAILED', source: 'phone' })
     expect(await importFile(null)).toEqual({ ok: false, code: 'READ_FAILED', source: null })
   })
@@ -120,6 +139,47 @@ describe('importFile', () => {
   it('keeps the LinkedIn message for a .csv that is not a LinkedIn export', async () => {
     const out = await importFile(fakeFile('Connections.csv', 'nom;ville\nA;Casablanca\n'))
     expect(out).toEqual({ ok: false, code: 'NOT_LINKEDIN_EXPORT', source: 'linkedin' })
+  })
+
+  describe('#31: a fold that splits a UTF-8 character', () => {
+    // « é » is C3 A9; the RFC 2425 fold (CRLF + space) falls between the two bytes.
+    const folded = concat(
+      'BEGIN:VCARD\r\nVERSION:3.0\r\nN:D',
+      [0xc3],
+      '\r\n ',
+      [0xa9],
+      'mo;Fold;;;\r\nFN:Fold Démo\r\nTITLE:Directrice financi',
+      [0xc3],
+      '\r\n ',
+      [0xa8],
+      're\r\nTEL;TYPE=CELL:+212 6 00 00 00 99\r\nEND:VCARD\r\n',
+    )
+
+    it('imports « Fold Démo » with no replacement character', async () => {
+      const out = await importFile(bytesFile('contacts.vcf', folded))
+      expect(out).toMatchObject({ ok: true, source: 'phone' })
+      expect(out.contacts).toHaveLength(1)
+      expect(out.contacts[0]).toMatchObject({
+        firstName: 'Fold',
+        lastName: 'Démo',
+        fullName: 'Fold Démo',
+        position: 'Directrice financière',
+        phone: '+212600000099',
+      })
+      expect(JSON.stringify(out.contacts)).not.toContain('�')
+    })
+
+    it('detects it by content whatever the name', async () => {
+      const out = await importFile(bytesFile('export.txt', folded))
+      expect(out).toMatchObject({ ok: true, source: 'phone' })
+      expect(out.contacts[0].lastName).toBe('Démo')
+    })
+
+    it('leaves the LinkedIn path unchanged (accents decoded as UTF-8)', async () => {
+      const out = await importFile(bytesFile('Connections.csv', new TextEncoder().encode(CSV)))
+      expect(out).toMatchObject({ ok: true, source: 'linkedin' })
+      expect(out.contacts[0]).toMatchObject({ firstName: 'Sara', lastName: 'Démo' })
+    })
   })
 
   it('gives UNSUPPORTED_FILE for a .pdf, a .txt that is neither format, and a file with no extension', async () => {

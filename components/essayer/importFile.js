@@ -1,7 +1,7 @@
 // Reads a user-chosen file, works out whether it is a LinkedIn Connections.csv or a phone
 // .vcf, and parses it with lib/linkedin.js or lib/vcard.js (#9 contract: detection order
 // content → extension → LinkedIn parser; one 50 MB cap for both formats).
-// Pure apart from file.text(): no storage, no network, no logging.
+// Pure apart from file.arrayBuffer(): no storage, no network, no logging.
 
 import { parseLinkedInCsv } from '../../lib/linkedin.js'
 import { isVCardText, parseVCard } from '../../lib/vcard.js'
@@ -44,7 +44,7 @@ export function detectSource(name, text) {
 }
 
 /**
- * @param {{ name?: string, size: number, text: () => Promise<string> }} file  a File (or anything shaped like one)
+ * @param {{ name?: string, size: number, arrayBuffer: () => Promise<ArrayBuffer> }} file  a File (or anything shaped like one)
  * @param {{ maxBytes?: number }} [options]
  * @returns {Promise<ImportOutcome>}
  */
@@ -53,16 +53,21 @@ export async function importFile(file, { maxBytes = MAX_FILE_BYTES } = {}) {
   const name = typeof file.name === 'string' ? file.name : ''
   if (file.size > maxBytes) return { ok: false, code: 'FILE_TOO_LARGE', source: sourceFromName(name) }
 
+  // Read the bytes once (#31): a vCard fold can split a UTF-8 character in two, and
+  // decoding before parseVCard unfolds the lines would turn each half into U+FFFD.
+  // parseVCard takes the bytes; the LinkedIn path and detection use the decoded text.
+  let buf
   let text
   try {
-    text = await file.text()
+    buf = await file.arrayBuffer()
+    text = new TextDecoder().decode(buf)
   } catch {
     return { ok: false, code: 'READ_FAILED', source: sourceFromName(name) }
   }
 
   const detected = detectSource(name, text)
   if (detected === 'phone') {
-    const result = parseVCard(text)
+    const result = parseVCard(buf)
     if (!result || result.errors.length > 0) {
       return { ok: false, code: result?.errors[0]?.code ?? 'NOT_VCARD', source: 'phone' }
     }
