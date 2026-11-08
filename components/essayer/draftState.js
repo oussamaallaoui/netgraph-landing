@@ -3,7 +3,7 @@
 // Copy: « Précisions PO Sprint 2 (2026-11-01) » on #8, §4–§5 (final).
 // Contract and client state: « Découpage tech lead Sprint 2 (2026-11-01) » on #8.
 
-import { draftMessage, linkedInProfileUrl, mailtoUrl } from '../../lib/drafts.js'
+import { draftMessage, linkedInProfileUrl, mailtoUrl, whatsappUrl } from '../../lib/drafts.js'
 
 const NBSP = ' '
 
@@ -19,11 +19,15 @@ export const DRAFT_UI = Object.freeze({
   copy: 'Copier',
   openLinkedIn: 'Ouvrir le profil LinkedIn',
   openMail: 'Ouvrir dans votre messagerie',
+  openWhatsApp: 'Ouvrir dans WhatsApp',
+  whatsappHint: "WhatsApp s'ouvre avec votre message prérempli. Vérifiez le destinataire, puis envoyez-le vous-même.",
+  whatsappTooLong:
+    'Ce message est trop long pour être ouvert dans WhatsApp. Copiez-le, puis collez-le dans votre conversation WhatsApp.',
   newTab: ' (nouvel onglet)',
   copied: 'Message copié',
   copyFailed: "La copie n'a pas fonctionné. Sélectionnez le texte, puis copiez-le.",
   noChannel:
-    "Votre fichier ne contient ni profil LinkedIn ni adresse email pour cette personne. Copiez le message pour l'envoyer par le moyen de votre choix.",
+    "Votre fichier ne contient ni profil LinkedIn, ni adresse email, ni numéro de téléphone pour cette personne. Copiez le message pour l'envoyer par le moyen de votre choix.",
   tooLong:
     'Ce message est trop long pour être ouvert dans votre messagerie. Copiez-le, puis collez-le dans un nouvel email.',
   promise: "NetGraph n'envoie rien à votre place. C'est vous qui envoyez le message.",
@@ -142,15 +146,25 @@ export function linkedInHint(contact) {
  * - `hasEmail`: the contact has a usable single address: the « Objet » field is shown.
  *   (Decided on the address, not on the URL length, so the field never vanishes while typing.)
  * - `mailto`: the mailto: URL for the current subject and body, or null (no email / too long).
- * - `hint`: the extra line, 'none' (neither channel), 'tooLong' (email, URL too long) or null.
+ * - `hasPhone` (#9): the contact has a number whatsappUrl accepts (E.164).
+ * - `whatsapp` (#9): the wa.me URL for the current body (never the subject), or null (no number,
+ *   or longer than 2,000 characters). It follows the edited body live, like `mailto`.
+ * - `hint`: the e-mail line, 'none' (no LinkedIn, no email and no number), 'tooLong' (email,
+ *   URL too long) or null.
+ * - `whatsappHint` (#9): 'ready' (shown with the button), 'tooLong' (number, body too long) or null.
  */
 export function draftActions(contact, subject, body) {
   const linkedIn = linkedInProfileUrl(contact)
   const to = typeof contact?.email === 'string' ? contact.email : ''
   const hasEmail = mailtoUrl({ to, subject: '', body: '' }) !== null
   const mailto = hasEmail ? mailtoUrl({ to, subject, body }) : null
+  const phone = typeof contact?.phone === 'string' ? contact.phone : null
+  const hasPhone = whatsappUrl({ phone, text: '' }) !== null
+  const whatsapp = hasPhone ? whatsappUrl({ phone, text: body }) : null
   let hint = null
   if (hasEmail && !mailto) hint = 'tooLong'
-  else if (!hasEmail && !linkedIn) hint = 'none'
-  return { linkedIn, hasEmail, mailto, hint }
+  else if (!hasEmail && !linkedIn && !hasPhone) hint = 'none'
+  let whatsappHint = null
+  if (hasPhone) whatsappHint = whatsapp ? 'ready' : 'tooLong'
+  return { linkedIn, hasEmail, mailto, hasPhone, whatsapp, hint, whatsappHint }
 }

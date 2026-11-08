@@ -1,7 +1,8 @@
 'use client'
 // The draft editor (#8), shown inline under a person card (no modal, no focus trap).
 // The user edits the drafted message and sends it from their own app: NetGraph only
-// offers three hand-offs, each a click: « Copier » (clipboard), « Ouvrir le profil
+// offers hand-offs, each a click: « Copier » (clipboard), « Ouvrir dans WhatsApp » (#9: a
+// plain wa.me link in a new tab, only with a valid number, body only), « Ouvrir le profil
 // LinkedIn » (new tab) and « Ouvrir dans votre messagerie » (mailto: to the user's own
 // mail app). Nothing here is stored (except the tone), logged or sent to our origin.
 // Copy: PO §4–§5 on #8, in ./draftState.js.
@@ -237,6 +238,12 @@ export default function DraftEditor({ id, contact, kind, companyLabel, onClose }
         <button type="button" onClick={handleCopy} className={BUTTON_PRIMARY}>
           {DRAFT_UI.copy}
         </button>
+        {actions.whatsapp && (
+          <a href={actions.whatsapp} target="_blank" rel="noopener noreferrer" className={BUTTON_SECONDARY}>
+            {DRAFT_UI.openWhatsApp}
+            <span className="sr-only">{DRAFT_UI.newTab}</span>
+          </a>
+        )}
         {actions.linkedIn && (
           <a href={actions.linkedIn} target="_blank" rel="noopener noreferrer" className={BUTTON_SECONDARY}>
             {DRAFT_UI.openLinkedIn}
@@ -256,6 +263,12 @@ export default function DraftEditor({ id, contact, kind, companyLabel, onClose }
         </p>
       )}
 
+      {actions.whatsappHint === 'ready' && (
+        <p className="mt-3 text-sm leading-relaxed text-slate">{DRAFT_UI.whatsappHint}</p>
+      )}
+      {actions.whatsappHint === 'tooLong' && (
+        <p className="mt-3 text-sm leading-relaxed text-slate">{DRAFT_UI.whatsappTooLong}</p>
+      )}
       {actions.linkedIn && <p className="mt-3 text-sm leading-relaxed text-slate">{linkedInHint(contact)}</p>}
       {actions.hint === 'tooLong' && <p className="mt-3 text-sm leading-relaxed text-slate">{DRAFT_UI.tooLong}</p>}
       {actions.hint === 'none' && <p className="mt-3 text-sm leading-relaxed text-slate">{DRAFT_UI.noChannel}</p>}

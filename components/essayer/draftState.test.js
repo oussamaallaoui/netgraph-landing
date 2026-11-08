@@ -187,7 +187,15 @@ describe('draftActions (PO §5)', () => {
 
   it('s27: neither, Copier only with the explanation', () => {
     const a = draftActions(s27, 'x', 'y')
-    expect(a).toEqual({ linkedIn: null, hasEmail: false, mailto: null, hint: 'none' })
+    expect(a).toEqual({
+      linkedIn: null,
+      hasEmail: false,
+      mailto: null,
+      hasPhone: false,
+      whatsapp: null,
+      hint: 'none',
+      whatsappHint: null,
+    })
   })
 
   it('email but too long: no mailto link, the « trop long » line, the subject field stays', () => {
@@ -210,6 +218,80 @@ describe('draftActions (PO §5)', () => {
 
   it('rejects a recipient that would add headers', () => {
     expect(draftActions({ ...s27, email: 'a@b.ma?cc=c@d.ma' }, '', '').hasEmail).toBe(false)
+  })
+})
+
+describe('draftActions: « Ouvrir dans WhatsApp » (#9 PO §5)', () => {
+  const PHONE = '+212600000001'
+
+  it('no number: no button, no WhatsApp line', () => {
+    const a = draftActions(s01, 'x', 'y')
+    expect(a.hasPhone).toBe(false)
+    expect(a.whatsapp).toBeNull()
+    expect(a.whatsappHint).toBeNull()
+  })
+
+  it('a valid number: the wa.me link with the body only, and the « Vérifiez le destinataire » line', () => {
+    const a = draftActions({ ...s01, phone: PHONE }, 'Mon objet', 'Bonjour Sara,\nÇa va ?')
+    expect(a.hasPhone).toBe(true)
+    expect(a.whatsapp).toBe('https://wa.me/212600000001?text=Bonjour%20Sara%2C%0A%C3%87a%20va%20%3F')
+    expect(a.whatsapp).not.toContain('objet')
+    expect(a.whatsappHint).toBe('ready')
+  })
+
+  it('follows the edited body live', () => {
+    const c = { ...s27, phone: PHONE }
+    expect(draftActions(c, '', 'A').whatsapp).toBe('https://wa.me/212600000001?text=A')
+    expect(draftActions(c, '', 'B').whatsapp).toBe('https://wa.me/212600000001?text=B')
+  })
+
+  it('a non-E.164 or invalid number counts as no number', () => {
+    for (const phone of ['0612345678', '12345', '+0612345678', '', null, 42]) {
+      const a = draftActions({ ...s27, phone }, '', 'x')
+      expect(a.whatsapp).toBeNull()
+      expect(a.hasPhone).toBe(false)
+      expect(a.hint).toBe('none')
+    }
+  })
+
+  it('a body too long for the link: no button, the « trop long … WhatsApp » line', () => {
+    const a = draftActions({ ...s27, phone: PHONE }, '', 'é'.repeat(800))
+    expect(a.hasPhone).toBe(true)
+    expect(a.whatsapp).toBeNull()
+    expect(a.whatsappHint).toBe('tooLong')
+    expect(a.hint).toBeNull()
+  })
+
+  it('the « no channel » line only when LinkedIn, email and number are all missing', () => {
+    expect(draftActions({ ...s27, phone: PHONE }, '', 'x').hint).toBeNull()
+    expect(draftActions(s27, '', 'x').hint).toBe('none')
+    expect(DRAFT_UI.noChannel).toBe(
+      "Votre fichier ne contient ni profil LinkedIn, ni adresse email, ni numéro de téléphone pour cette personne. Copiez le message pour l'envoyer par le moyen de votre choix.",
+    )
+  })
+
+  it('uses the PO copy word for word', () => {
+    expect(DRAFT_UI.openWhatsApp).toBe('Ouvrir dans WhatsApp')
+    expect(DRAFT_UI.whatsappHint).toBe(
+      "WhatsApp s'ouvre avec votre message prérempli. Vérifiez le destinataire, puis envoyez-le vous-même.",
+    )
+    expect(DRAFT_UI.whatsappTooLong).toBe(
+      'Ce message est trop long pour être ouvert dans WhatsApp. Copiez-le, puis collez-le dans votre conversation WhatsApp.',
+    )
+  })
+
+  it('the six PO numbers: 2126, 2127, 2126, 2126, 336, and none for 12345', async () => {
+    const { normalizePhone } = await import('../../lib/phone.js')
+    const raw = ['06 12 34 56 78', '07-12-34-56-78', '+212 6 12 34 56 78', '00212612345678', '+33 6 12 34 56 78', '12345']
+    const links = raw.map((r) => draftActions({ ...s27, phone: normalizePhone(r) }, '', '').whatsapp)
+    expect(links).toEqual([
+      'https://wa.me/212612345678',
+      'https://wa.me/212712345678',
+      'https://wa.me/212612345678',
+      'https://wa.me/212612345678',
+      'https://wa.me/33612345678',
+      null,
+    ])
   })
 })
 

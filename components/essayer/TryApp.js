@@ -1,6 +1,8 @@
 'use client'
 // /essayer: step state. Loads the stored contacts on mount, shows the import
-// step, or the preview followed by the request and results step (#6). Contacts live in React state and in lib/store.js
+// step, or the preview followed by the request and results step (#6). Since #9 the state is the stored
+// record (v2, one list per source): withImport() builds the next one, combineSources() gives the
+// merged list shown, matched and drafted from. Contacts live in React state and in lib/store.js
 // (IndexedDB, this device only). Nothing here sends, logs or tracks contact data.
 
 import { useEffect, useRef, useState } from 'react'
@@ -12,7 +14,9 @@ import ClearDataButton from './ClearDataButton'
 import RequestStep from './RequestStep'
 import Arrow from './Arrow'
 import { importErrorMessage } from './importErrors'
+import { importStatusLines, lastImportOf, recordHasPhone } from './importCopy'
 import { loadContacts, saveContacts, clearAllData } from '../../lib/store.js'
+import { combineSources, withImport } from '../../lib/merge.js'
 import { FOCUS, LINK, TOUCH } from './ui'
 
 /** @typedef {import('../../lib/types.js').Contact} Contact */
@@ -23,8 +27,17 @@ export const CLEAR_BLOCKED_MESSAGE = 'Fermez les autres onglets NetGraph ouverts
 export default function TryApp() {
   // 'loading' until loadContacts() answers, then 'import' or 'preview'
   const [step, setStep] = useState('loading')
-  /** @type {[null | { contacts: Contact[], isSample: boolean, skipped: number }, Function]} */
-  const [data, setData] = useState(null)
+  // The stored record (v2, one list per source, ADR 0002). The merged list is derived from it.
+  /** @type {[import('../../lib/types.js').StoredContacts | null, Function]} */
+  // Kept with its merged list, so combineSources (≈100 ms for 30k + 5k contacts) runs once
+  // per record change: in the load or import handler, never again on render.
+  /** @type {[null | { record: import('../../lib/types.js').StoredContacts, combined: { contacts: Contact[], merged: number } }, Function]} */
+  const [stored, setStored] = useState(null)
+  const record = stored?.record ?? null
+  const hasPhone = recordHasPhone(record)
+  /** The import just done in this visit, for the status lines (null after a reload). */
+  const [lastImport, setLastImport] = useState(null)
+  const data = stored && stored.combined.contacts.length > 0 ? stored.combined : null
   const [persisted, setPersisted] = useState(true)
   const [cleared, setCleared] = useState(false)
   const [clearBlocked, setClearBlocked] = useState(false)
@@ -40,10 +53,11 @@ export default function TryApp() {
 
   useEffect(() => {
     let active = true
-    loadContacts().then(stored => {
+    loadContacts().then(loaded => {
       if (!active) return
-      if (stored && stored.contacts.length > 0) {
-        setData({ contacts: stored.contacts, isSample: stored.isSample, skipped: 0 })
+      const combined = loaded ? combineSources(loaded) : null
+      if (combined && combined.contacts.length > 0) {
+        setStored({ record: loaded, combined })
         setStep('preview')
       } else {
         setStep('import')
@@ -59,20 +73,26 @@ export default function TryApp() {
     target?.focus()
   }, [step, importError])
 
-  async function handleImported({ contacts, isSample, skipped }) {
-    const { persisted: ok } = await saveContacts({ contacts, isSample })
+  async function handleImported({ source, contacts, skipped, unrecognizedPhones }) {
+    // Replaces that source only (the sample replaces everything, a real import drops it).
+    const next = withImport(record, source, contacts)
+    const { persisted: ok } = await saveContacts(next)
     setPersisted(ok)
     setCleared(false)
     setClearBlocked(false)
     setImportError(null)
-    setData({ contacts, isSample, skipped })
+    const combined = combineSources(next)
+    setStored({ record: next, combined })
+    setLastImport(
+      lastImportOf(next, { source, imported: contacts.length, skipped, unrecognizedPhones, merged: combined.merged }),
+    )
     setImportCount(n => n + 1)
     focusNext.current = 'heading'
     setStep('preview')
   }
 
-  function handleImportErrorWithPrevious(code) {
-    setImportError(code)
+  function handleImportErrorWithPrevious(code, source) {
+    setImportError({ code, source })
     focusNext.current = 'error'
     setStep('preview')
   }
@@ -86,7 +106,8 @@ export default function TryApp() {
       setClearBlocked(true)
       return { cleared: false }
     }
-    setData(null)
+    setStored(null)
+    setLastImport(null)
     setPersisted(true)
     setImportError(null)
     setClearBlocked(false)
@@ -136,6 +157,7 @@ export default function TryApp() {
             onImported={handleImported}
             onError={data ? handleImportErrorWithPrevious : null}
             onCancel={data ? handleCancelReplace : null}
+            hasPhone={hasPhone}
             notice={cleared ? CLEARED_MESSAGE : null}
           />
         )}
@@ -149,7 +171,7 @@ export default function TryApp() {
                   tabIndex={-1}
                   className="mb-6 rounded-2xl border border-red-200 bg-white p-4 text-sm font-medium leading-relaxed text-red-700 focus:outline-none"
                 >
-                  {importErrorMessage(importError, { hasPrevious: true })}
+                  {importErrorMessage(importError.code, { source: importError.source, hasPrevious: true })}
                 </p>
               )}
             </div>
@@ -163,11 +185,12 @@ export default function TryApp() {
             <ContactPreview
               headingRef={headingRef}
               contacts={data.contacts}
-              isSample={data.isSample}
-              skipped={data.skipped}
+              isSample={record.isSample}
+              hasPhone={hasPhone}
+              statusLines={importStatusLines(lastImport)}
             />
 
-            <RequestStep key={importCount} contacts={data.contacts} isSample={data.isSample} />
+            <RequestStep key={importCount} contacts={data.contacts} isSample={record.isSample} />
 
             <div className="mt-10 flex flex-col gap-6 border-t border-gray-100 pt-8 sm:flex-row sm:items-start sm:justify-between">
               <button type="button" onClick={handleReplace} className={`${TOUCH} self-start text-sm ${LINK}`}>
@@ -175,6 +198,7 @@ export default function TryApp() {
               </button>
               <ClearDataButton
                 onClear={handleClear}
+                hasPhone={hasPhone}
                 error={clearBlocked ? CLEAR_BLOCKED_MESSAGE : null}
               />
             </div>

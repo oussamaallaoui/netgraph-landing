@@ -1,11 +1,13 @@
 'use client'
 // Import step: the on-device promise (under the intro, #20), how to get the LinkedIn
-// export, a drop zone with a labelled file input, and the sample-data button.
-// Copy: final PO wording (#5 comment 2026-10-29).
+// export and the phone export (.vcf), one drop zone with a labelled file input that takes
+// either file (importFile detects which), and the sample-data button.
+// Copy: #5 comment 2026-10-29, updated by « Précisions PO Sprint 3 » §6 on #9 (final).
 
 import { useEffect, useId, useState } from 'react'
 import { importFile } from './importFile'
-import { importErrorMessage } from './importErrors'
+import { importErrorMessage, MAX_FILE_MB } from './importErrors'
+import { backToImportedLabel } from './importCopy'
 import { SAMPLE_CONTACTS } from '../../lib/fixtures/sample-contacts.js'
 import Arrow from './Arrow'
 import { BUTTON_SECONDARY, LINK, TOUCH } from './ui'
@@ -23,19 +25,37 @@ const STEPS = [
   </>,
 ]
 
+const PHONE_STEPS = [
+  <>
+    Sur iPhone&nbsp;: ouvrez l&apos;app Contacts, touchez «&nbsp;Listes&nbsp;», maintenez le doigt sur «&nbsp;Tous les
+    contacts&nbsp;», puis choisissez «&nbsp;Exporter&nbsp;». Enregistrez le fichier .vcf dans Fichiers, puis déposez-le ici.
+  </>,
+  <>
+    Sur Android&nbsp;: ouvrez l&apos;application Contacts et cherchez «&nbsp;Exporter&nbsp;» (souvent dans le menu ⋮ ou
+    dans «&nbsp;Gérer les contacts&nbsp;»). Choisissez un fichier .vcf, puis déposez-le ici.
+  </>,
+  <>Vous pouvez aussi ouvrir cette page sur votre téléphone et choisir le fichier directement.</>,
+]
+
+/**
+ * @typedef {{ source: 'linkedin'|'phone'|'sample', contacts: any[], skipped: number, unrecognizedPhones: number }} ImportedFile
+ */
+
 /**
  * @param {object} props
- * @param {(result: { contacts: any[], isSample: boolean, skipped: number }) => Promise<void>} props.onImported
- * @param {((code: string) => void) | null} [props.onError]  set when a previous import exists: the parent
- *   shows the error above the previous preview instead of here
+ * @param {(result: ImportedFile) => Promise<void>} props.onImported
+ * @param {((code: string, source: 'linkedin'|'phone'|null) => void) | null} [props.onError]  set when a
+ *   previous import exists: the parent shows the error above the previous preview instead of here
  * @param {(() => void) | null} [props.onCancel]
  * @param {string | null} [props.notice]  announced once after mount (e.g. after deletion)
+ * @param {boolean} [props.hasPhone]  phone contacts are stored: the back link says « contacts »
  */
-export default function ImportStep({ headingRef, onImported, onError, onCancel, notice }) {
+export default function ImportStep({ headingRef, onImported, onError, onCancel, notice, hasPhone = false }) {
   const inputId = useId()
   const hintId = useId()
   const [busy, setBusy] = useState(null) // null | 'file' | 'sample'
-  const [errorCode, setErrorCode] = useState(null)
+  /** null | { code, source }: the failed import, shown here when nothing was imported before */
+  const [error, setError] = useState(null)
   const [dragOver, setDragOver] = useState(false)
   // Inserted into the live region after mount, so screen readers announce it.
   const [liveNotice, setLiveNotice] = useState(null)
@@ -49,15 +69,20 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
   async function handleFile(file) {
     if (!file || busy) return
     setBusy('file')
-    setErrorCode(null)
+    setError(null)
     setLiveNotice(null)
     const out = await importFile(file)
     if (out.ok) {
-      await onImported({ contacts: out.contacts, isSample: false, skipped: out.skipped })
+      await onImported({
+        source: out.source,
+        contacts: out.contacts,
+        skipped: out.skipped,
+        unrecognizedPhones: out.unrecognizedPhones,
+      })
     } else if (onError) {
-      onError(out.code)
+      onError(out.code, out.source)
     } else {
-      setErrorCode(out.code)
+      setError({ code: out.code, source: out.source })
       setBusy(null)
     }
   }
@@ -65,9 +90,14 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
   async function handleSample() {
     if (busy) return
     setBusy('sample')
-    setErrorCode(null)
+    setError(null)
     setLiveNotice(null)
-    await onImported({ contacts: SAMPLE_CONTACTS.map(c => ({ ...c, sources: [...c.sources] })), isSample: true, skipped: 0 })
+    await onImported({
+      source: 'sample',
+      contacts: SAMPLE_CONTACTS.map(c => ({ ...c, sources: [...c.sources] })),
+      skipped: 0,
+      unrecognizedPhones: 0,
+    })
   }
 
   function handleDrop(e) {
@@ -90,11 +120,11 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
         tabIndex={-1}
         className="mb-4 text-3xl font-semibold leading-tight tracking-tight text-ink focus:outline-none sm:text-4xl"
       >
-        Importez vos relations LinkedIn
+        Importez vos contacts
       </h1>
       <p className="mb-6 max-w-xl text-base leading-relaxed text-slate">
-        NetGraph cherche dans votre réseau les personnes qui peuvent vous aider. Commencez par le fichier
-        de vos relations LinkedIn.
+        NetGraph cherche dans votre réseau les personnes qui peuvent vous aider. Importez vos relations
+        LinkedIn, les contacts de votre téléphone, ou les deux.
       </p>
 
       {/* The on-device promise (exact wording from the #5 criteria). Shown once, right under the
@@ -112,9 +142,9 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
       </div>
 
       <div className="grid gap-8 md:grid-cols-[1fr_1.1fr]">
-        {/* How to get the file */}
+        {/* How to get the files */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold text-ink">Comment obtenir le fichier</h2>
+          <h2 className="mb-4 text-lg font-semibold text-ink">Relations LinkedIn (Connections.csv)</h2>
           <ol className="space-y-3 text-sm leading-relaxed text-slate">
             {STEPS.map((text, i) => (
               <li key={i} className="flex gap-3">
@@ -133,6 +163,16 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
               Ouvrir la page d&apos;export de LinkedIn<span className="sr-only"> (nouvel onglet)</span>
             </a>
           </p>
+
+          <h2 className="mb-4 mt-8 text-lg font-semibold text-ink">Contacts du téléphone (.vcf)</h2>
+          <ul className="space-y-3 text-sm leading-relaxed text-slate">
+            {PHONE_STEPS.map((text, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet" aria-hidden="true" />
+                <span>{text}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* Drop zone + labelled file input */}
@@ -154,15 +194,15 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
                 <path d="M10 3v10m0 0l-4-4m4 4l4-4M4 16h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
-            <span className="text-base font-medium text-ink">Déposez votre fichier Connections.csv</span>
+            <span className="text-base font-medium text-ink">Déposez votre fichier Connections.csv ou .vcf</span>
             <span className="text-sm text-slate">
               ou <span className="font-medium text-violet underline underline-offset-2">choisissez-le sur votre appareil</span>
             </span>
-            <span id={hintId} className="text-xs text-slate">Fichier .csv · 10 Mo maximum</span>
+            <span id={hintId} className="text-xs text-slate">Fichier .csv ou .vcf · {MAX_FILE_MB}&nbsp;Mo maximum</span>
             <input
               id={inputId}
               type="file"
-              accept=".csv,text/csv"
+              accept=".csv,.vcf,text/csv,text/vcard,text/x-vcard"
               aria-describedby={hintId}
               className="sr-only"
               disabled={!!busy}
@@ -181,12 +221,12 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
                 {busy === 'sample' ? "Chargement des contacts d'exemple…" : 'Lecture du fichier…'}
               </p>
             )}
-            {!busy && errorCode && (
+            {!busy && error && (
               <p className="rounded-2xl border border-red-200 bg-white p-4 font-medium text-red-700">
-                {importErrorMessage(errorCode)}
+                {importErrorMessage(error.code, { source: error.source })}
               </p>
             )}
-            {!busy && !errorCode && liveNotice && <p className="text-ink">{liveNotice}</p>}
+            {!busy && !error && liveNotice && <p className="text-ink">{liveNotice}</p>}
           </div>
 
           <div className="mt-6 border-t border-gray-100 pt-6">
@@ -200,7 +240,7 @@ export default function ImportStep({ headingRef, onImported, onError, onCancel, 
           {onCancel && (
             <p className="mt-4 text-sm">
               <button type="button" onClick={onCancel} className={`${TOUCH} ${LINK}`}>
-                Revenir à mes relations importées
+                {backToImportedLabel(hasPhone)}
               </button>
             </p>
           )}
