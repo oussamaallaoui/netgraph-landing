@@ -1,6 +1,6 @@
 # Known issues
 
-As of 2026-11-01. Each item should have a GitHub issue; items without one are flagged for the PO to triage.
+As of 2026-11-07. Each item should have a GitHub issue; items without one are flagged for the PO to triage.
 
 ## Blocking
 
@@ -8,23 +8,20 @@ As of 2026-11-01. Each item should have a GitHub issue; items without one are fl
 
 `app/api/subscribe/route.js` saves signups to `subscribers.json`. Vercel's filesystem is read-only, so on https://netgraph-landing.vercel.app every submission returns an error ("Une erreur s'est produite. Réessayez."). Nothing is saved.
 
-**Fix:** store signups in Upstash Redis (#11, labelled `blocked`). The founder creates the database in Vercel (Storage → Upstash for Redis) and connects it to the project; then the route is changed to use it. **Only together with or after #10.**
+**Fix:** store signups in Upstash Redis (#11, labelled `blocked`). The founder creates the database in Vercel (Storage → Upstash for Redis) and connects it to the project; then the route is changed to use it. **Only after #10 is merged and checked in production**, and together with the « déjà inscrit » fix below.
 
-Sprint 1 doesn't touch signup storage or `/api/subscribe`.
+#10 (Sprint 3) changed only validation and logging in `/api/subscribe`, not storage: after it, a production signup still ends on the error message, now as a clean `500 Erreur serveur` with the log line `subscribe: save failed EROFS`. That is expected, not a regression.
 
 ## Security and privacy
 
-### The subscriber list is public — #10
+### « Déjà inscrit » tells anyone whether an address signed up (dormant until #11)
 
-`GET /api/subscribe` returns every subscriber's email, name, company and role to anyone. On Vercel the list is empty today only because nothing can be saved (`subscribers.json` is git-ignored and absent from the deployment). It would leak as soon as storage works. QA checks at the end of Sprint 1 that it still returns an empty list on production.
+`POST /api/subscribe` answers `409 Déjà inscrit` for an address already on the list, and the form shows « Cet email est déjà inscrit ». Anyone can type an address and learn whether that person signed up (email enumeration). Dormant today: nothing can be saved in production. **Fix with or before #11:** answer an existing address exactly like a new signup. Out of scope of #10 (visitor-facing behaviour unchanged); the PO has asked the founder.
 
-**Fix:** remove the `GET` handler, or protect it with a secret and move it to an admin-only route. **Do this before or together with the storage fix (#11).**
+### Fixed in #10 (Sprint 3)
 
-### Emails are written to the logs — #10
-
-The route logs every new subscriber's email (`console.log`). On Vercel this line is never reached today (the save fails first), but on a developer's machine the file is writable, so local runs do log emails: use only fake test emails (`test+qa1@netgraph.test`).
-
-**Fix:** log only a count or nothing (#10).
+- **The subscriber list was public.** `GET /api/subscribe` returned every subscriber's email, name, company and role. The `GET` handler is removed: `GET` and `HEAD` now answer `405`, and there is no list in the app. Once #11 stores signups, the founder reads them in the Upstash console (Vercel → Storage → the database → Data Browser).
+- **Emails were written to the logs.** The route no longer logs anything about a subscriber. A storage failure logs one fixed line with the error code only (`subscribe: save failed EROFS`), and a malformed body is rejected (`400`) without its parse error (which quoted part of the body) ever reaching the logs.
 
 ## Limitations by design (Sprint 1, local-first)
 
@@ -57,6 +54,7 @@ Accepted limits of « Préparer un message » (`lib/drafts.js`, `components/essa
 
 ## Minor
 
+- **A name, company or role over 100 characters** makes the signup fail with the generic « Une erreur s'est produite. Réessayez. » (`400 Requête invalide`, #10). The form has no `maxLength` on these fields; adding `maxLength={100}` is a frontend follow-up if the PO wants it.
 - Some text is below 4.5:1 contrast: `gray-400` fine print and captions, and `signal` green text in the beta pill. See the design system's colour notes. (Backlog item "Corriger les contrastes insuffisants et l'année du pied de page", no issue yet.)
 - The footer still says "© 2025". (Same backlog item.)
 - The landing page demo and testimonials use **real company names** (McKinsey, CIH Bank, Deloitte, BMCE Capital, Attijariwafa, OCP Group) with invented quotes attributed to people at those firms. Flagged on 2026-10-27; no issue yet, for the PO to triage. Sprint 1 fixtures use only invented companies.
