@@ -28,7 +28,13 @@ npm run dev
 
 The site runs on http://localhost:3000.
 
-Locally, the signup form saves to `subscribers.json` at the project root. The file is git-ignored because it holds personal data. Never commit it.
+**Beta signup form locally.** Production and previews store signups in Upstash Redis with credentials only Vercel has. You don't need them: start the server with an in-memory store instead.
+
+```bash
+SIGNUP_STORE=memory npm run dev                       # or: npm run build && SIGNUP_STORE=memory npm start
+```
+
+Signups then live in the server process and disappear when it stops. Without `SIGNUP_STORE=memory` (and without credentials), `POST /api/subscribe` answers a clean `500 Erreur serveur` and logs `subscribe: save failed config`, which is how QA checks the error screen. `SIGNUP_STORE` is ignored on Vercel. Never put real credentials in a local `.env*` file, and use only fake addresses (`test+qa1@netgraph.test`).
 
 ## Scripts
 

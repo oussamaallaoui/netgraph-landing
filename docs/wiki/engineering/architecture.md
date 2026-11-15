@@ -10,7 +10,9 @@ Browser ──> Vercel (Next.js 14, App Router)
               ├─ app/layout.js        metadata, global CSS
               ├─ app/essayer/         Sprint 1: import → request → results → draft (client-side only)
               └─ app/api/subscribe    POST: beta signup (GET removed, #10)
-                    └─ subscribers.json   local file — doesn't work on Vercel (#11)
+                    └─ lib/signups.js addSignup ──> lib/redis.js getRedis ──HTTPS (REST)──> Upstash Redis (#11, ADR 0003)
+                         one key per address, SET NX:  signup:<email>  (preview:signup:…, local:signup:… elsewhere)
+                         locally with SIGNUP_STORE=memory: lib/memoryRedis.js (in-process, lost on restart)
 
 Inside the browser, on /essayer (Sprint 1, phone contacts since #9):
   Connections.csv ──> lib/linkedin.js ──────────────┐
@@ -75,6 +77,10 @@ lib/                         pure functions, no React, no DOM (except store.js)
   phone.js                   normalizePhone → E.164, Morocco by default (#9)
   vcard.js                   isVCardText, parseVCard: Android 2.1, iPhone 3.0, vCard 4.0 (#9)
   merge.js                   withImport, combineSources, nameKey: one list per source, merged on read (#9)
+  subscribe.js               validateSignup, isValidEmail (shared with the signup form, #10/#11)
+  redis.js                   getRedis, SignupStoreConfigError: the only importer of @upstash/redis (server only, #11)
+  memoryRedis.js             createMemoryRedis: in-memory RedisLike for tests and SIGNUP_STORE=memory (#11)
+  signups.js                 signupKey, signupRecord, addSignup, errorCategory (server only, #11)
   fixtures/                  sample-contacts.js, Connections.sample.csv, phone-{android,iphone,v4}.sample.vcf,
                              reference-requests.js, synthetic.js
 ```
@@ -90,6 +96,8 @@ lib/                         pure functions, no React, no DOM (except store.js)
 
 ## Dependencies
 
+**Runtime:** `@upstash/redis` (MIT, pinned to an exact version), since #11, for beta signups only; imported by `lib/redis.js` alone ([ADR 0003](../../adr/0003-beta-signups-upstash-redis.md)).
+
 Sprint 1 adds **no runtime dependency**. Dev dependencies only: `vitest` (test runner) and `fake-indexeddb` (tests for `lib/store.js`).
 
 - **CSV parsing:** a small in-house parser (`lib/csv.js`, quotes, escaped quotes, commas and newlines inside quotes, CRLF, BOM). LinkedIn's file is a single, simple format; a ~60-line tested function is less to audit than a library. If real exports break it, Papa Parse (MIT, no dependencies) is the fallback, with a tech lead review.
@@ -100,7 +108,7 @@ Sprint 1 adds **no runtime dependency**. Dev dependencies only: `vitest` (test r
 
 Decisions are recorded as ADRs in [`docs/adr/`](../../adr/). The likely shape after Sprint 1:
 
-- **Storage:** Upstash Redis first, for beta signups (#11, after the security fix #10). A relational database (Postgres) once there are users and server-side data.
+- **Storage:** Upstash Redis for beta signups (#11, [ADR 0003](../../adr/0003-beta-signups-upstash-redis.md)). A relational database (Postgres) once there are users and server-side data.
 - **Auth:** user accounts (#13) before anything about contacts is stored server-side (sync across devices, second-degree paths). This supersedes the earlier "accounts before any contact import" line: local-first import ships first (ADR 0001).
 - **Contacts on the server (later):** owned by the user who imported them, minimal fields, encrypted at rest, deletable. A new ADR will supersede 0001. See [Data and privacy](../compliance/data-privacy.md).
 - **Matching:** pure, testable functions (Sprint 1); link strength and path-finding when interaction data and opted-in second-degree contacts exist.
