@@ -288,7 +288,6 @@ function SubscribeForm() {
   const [company, setCompany] = useState('')
   const [role, setRole]     = useState('')
   const [loading, setLoading] = useState(false)
-  const [count, setCount]   = useState(47)
   const inputRef = useRef(null)
 
   useEffect(() => { inputRef.current?.focus() }, [])
@@ -310,7 +309,6 @@ function SubscribeForm() {
       })
       const data = await res.json()
       if (res.ok) {
-        setCount(data.total)
         setStep('success')
       } else if (res.status === 409) {
         setStep('already')
@@ -330,8 +328,7 @@ function SubscribeForm() {
       </div>
       <p className="font-semibold text-ink text-lg mb-1">Vous êtes sur la liste !</p>
       <p className="text-slate text-sm">
-        Vous faites partie des <strong>{count} premiers</strong> à rejoindre NetGraph.
-        On vous contacte en priorité pour l'accès beta.
+        Nous vous contacterons en priorité pour l'accès à la beta.
       </p>
     </div>
   )
@@ -450,7 +447,7 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
             bg-violet-light text-violet text-xs font-medium mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-signal"></span>
-            47 professionnels déjà inscrits · Accès beta ouvert
+            Accès beta ouvert
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-semibold text-ink leading-[1.12] tracking-tight mb-6">
@@ -489,7 +486,7 @@ export default function LandingPage() {
 
           {/* Sources */}
           <div className="flex items-center justify-center gap-6 text-sm text-slate flex-wrap">
-            {['Téléphone', 'LinkedIn', 'Instagram', 'Excel'].map(s => (
+            {['Téléphone', 'LinkedIn', 'Instagram (bientôt)', 'Excel (bientôt)'].map(s => (
               <span key={s} className="flex items-center gap-1.5">
                 <span className="w-1 h-1 rounded-full bg-gray-300"/>
                 {s}
@@ -580,7 +577,7 @@ export default function LandingPage() {
               {
                 n: '01', icon: STEP_ICONS.import,
                 title: 'Importez vos contacts',
-                desc: 'Téléphone, LinkedIn, Instagram ou Excel. Les doublons se fusionnent automatiquement.',
+                desc: "Téléphone et LinkedIn aujourd'hui, Instagram et Excel bientôt. Une même personne est regroupée quand son nom complet ou son numéro est identique.",
               },
               {
                 n: '02', icon: STEP_ICONS.ask,
