@@ -70,7 +70,7 @@ Accepted limits of the `.vcf` import and « Ouvrir dans WhatsApp » (`lib/vcard.
 - **A French number saved locally is read as Moroccan.** `06 12 34 56 78` saved without `+33` becomes `+212 6 12 34 56 78`: Morocco is the default country. Numbers saved with `+33` or `0033` are correct. The WhatsApp line asks the user to check the recipient.
 - Numbers that can't be read (too short, `08…`, 9 bare digits, extensions such as `p123` or `;ext=`) are dropped: the contact is imported without a number and without « Ouvrir dans WhatsApp ». The import says how many (« numéros non reconnus »).
 - When a contact has several numbers, only one is kept: the one typed mobile (`CELL`, `MOBILE`, `IPHONE`), else the first Moroccan mobile (`+2126…`, `+2127…`), else the first readable one. The user can't choose another number in NetGraph.
-- Two phone cards with the same number are one contact (the first is kept, the other counts as « en double »), even if the names differ (a shared office line, for example).
+- Two phone cards with the same number are one contact (the first is kept, the other counts as « en double »), even if the names differ (a shared office line, for example). Accepted by the founder on 2026-11-15 until the real exports are checked (B6, tracked in #36), then reviewed.
 
 **WhatsApp hand-off.**
 
@@ -87,5 +87,5 @@ Accepted limits of the `.vcf` import and « Ouvrir dans WhatsApp » (`lib/vcard.
 
 - **A name, company or role over 100 characters** makes the signup fail with the generic « Une erreur s'est produite. Réessayez. » (`400 Requête invalide`, #10). The form has no `maxLength` on these fields; adding `maxLength={100}` is a frontend follow-up if the PO wants it.
 - Some text is below 4.5:1 contrast: `gray-400` fine print and captions, and `signal` green text in the beta pill. See the design system's colour notes. (Backlog item "Corriger les contrastes insuffisants et l'année du pied de page", no issue yet.)
-- The footer still says "© 2025". (Same backlog item.)
-- The landing page demo and testimonials use **real company names** (McKinsey, CIH Bank, Deloitte, BMCE Capital, Attijariwafa, OCP Group) with invented quotes attributed to people at those firms. Flagged on 2026-10-27; no issue yet, for the PO to triage. Sprint 1 fixtures use only invented companies.
+- The footer still says "© 2025". (In #34.)
+- The landing page demo and testimonials use **real company names** (McKinsey, CIH Bank, Deloitte, BMCE Capital, Attijariwafa, OCP Group) with invented quotes attributed to people at those firms. Flagged on 2026-10-27; now #34 (backlog, outside Sprint 4). Sprint 1 fixtures use only invented companies.
