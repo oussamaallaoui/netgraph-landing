@@ -1,6 +1,6 @@
 # Known issues
 
-As of 2026-11-07. Each item should have a GitHub issue; items without one are flagged for the PO to triage.
+As of 2026-11-15. Each item should have a GitHub issue; items without one are flagged for the PO to triage.
 
 ## Blocking
 
@@ -39,7 +39,7 @@ Accepted limits of « Qui peut vous présenter chez … » (`lib/introducers.js`
 - **Partial company names show nothing.** « chez ATLAS » when the file has « Atlas Conseil », or « chez Oasis » for « Oasis Capital Démo »: there is no section and no « absent » notice (PO decision, 2026-11-01). The notice would contradict the #6 list, which matches the word « atlas ». Before that decision, these requests showed the notice. Opening the section on a partial name needs a separate backlog story (pending).
 - **A one-word generic company can't be named.** A company called only « Conseil » (one vocabulary word) is never detected in a request, even after « chez », because `buildIndex` doesn't make it mentionable. The user sees nothing, not a false notice. Multi-word generic names (« Finance Conseil ») work after a cue.
 - **A capitalised place after a role word reads as a company.** « DAF de Casablanca » shows « Aucune personne de votre réseau ne travaille chez Casablanca… ». Lowercase words (« DAF de la région », « responsable d'agence ») and « quelqu'un à Rabat » show nothing.
-- **#22 still affects the #6 list on the same screen.** A legal suffix typed in the request (« chez Oasis Capital Démo SARL ») gives the right introducer section, but the #6 results below rank and explain people by « SARL » (« son nom contient « SARL » »). Fix proposed in #22, not approved yet.
+- **Fixed in #22 (Sprint 4): a legal form typed after the company.** « chez Oasis Capital Démo SARL », « chez Atlasia & Co »: the legal form (any `LEGAL_SUFFIXES` entry, plus « & Co » / « et Co ») now belongs to the company mention (`findCompanyMentions`), so the #6 list ranks and explains people exactly as without it, and a free word found in a company name reads « le nom de son entreprise contient « … » ». Accepted side effect: a legal-form word typed right after a company name (« co », « group », « sa »…) is always read as part of the company, never as a word of the request.
 - **Focus-mode announcement gap.** Focus moves to the first heading only after an example button, and no example request opens an introducer section or notice. So that path is never exercised with the #7 area: keyboard and screen-reader users who type their own request rely on the single `role="status"` message.
 
 ## Drafts (#8, Sprint 2)
