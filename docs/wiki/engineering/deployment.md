@@ -25,7 +25,7 @@ Only `netgraph-landing.vercel.app` is public. The `…-oussamaallaoui.vercel.app
 | `VERCEL`, `VERCEL_ENV` | Vercel (system) | `lib/redis.js`, `lib/signups.js` | `VERCEL` disables `SIGNUP_STORE`; `VERCEL_ENV` picks the key prefix |
 | `SIGNUP_STORE` | developers, locally only | `lib/redis.js` | `memory` = in-process store; ignored when `VERCEL` is set |
 
-The integration also injects `KV_REST_API_READ_ONLY_TOKEN`, `KV_URL` and `REDIS_URL`: **not used**. The client's telemetry is off (`enableTelemetry: false`). If `KV_REST_API_URL` or `KV_REST_API_TOKEN` is missing, signups fail with `500` and the log line `subscribe: save failed config`.
+The integration also injects `KV_REST_API_READ_ONLY_TOKEN`, `KV_URL` and `REDIS_URL`: **not used**. The client's telemetry is off (`enableTelemetry: false`); it retries a failed request twice and gives up after 3 s per request (`signal: () => AbortSignal.timeout(3000)`, function form only, see `lib/redis.js`), so an outage answers `500` within a few seconds. If `KV_REST_API_URL` or `KV_REST_API_TOKEN` is missing, signups fail with `500` and the log line `subscribe: save failed config`.
 
 **Signup keys** ([ADR 0003](../../adr/0003-beta-signups-upstash-redis.md)): `signup:<email>` in Production, `preview:signup:<email>` on previews (`VERCEL_ENV=preview`), `development:signup:…` / `local:signup:…` elsewhere. Preview data can be purged by prefix even if Preview and Production share one database.
 

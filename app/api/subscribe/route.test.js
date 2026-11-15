@@ -241,6 +241,23 @@ describe('POST /api/subscribe', () => {
     expectNothingLoggedAbout('netgraph.test')
   })
 
+  it('maps UpstashJSONParseError to « upstash », UrlError to « config », TimeoutError to « network »', async () => {
+    const named = (name) => Object.assign(new Error(`${name} test+qa1@netgraph.test https://fake-redis.netgraph.test`), { name })
+    for (const name of ['UpstashJSONParseError', 'UrlError', 'TimeoutError']) {
+      store.redis.failNext(named(name))
+      const res = await post(JSON.stringify({ email: 'test+qa1@netgraph.test' }))
+      expect(res.status, name).toBe(500)
+      expect(await res.text()).toBe('{"error":"Erreur serveur"}')
+    }
+    expect(console.error.mock.calls).toEqual([
+      ['subscribe: save failed', 'upstash'],
+      ['subscribe: save failed', 'config'],
+      ['subscribe: save failed', 'network'],
+    ])
+    expectNothingLoggedAbout('netgraph.test')
+    expect(store.redis.dump().size).toBe(0)
+  })
+
   it('accepts the address again after a failure (nothing half-written)', async () => {
     store.redis.failNext(upstashError('test+qa1@netgraph.test'))
     expect((await post(JSON.stringify(signup))).status).toBe(500)
