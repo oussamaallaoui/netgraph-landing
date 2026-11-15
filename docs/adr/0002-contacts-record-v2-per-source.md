@@ -1,6 +1,6 @@
 # 0002. One stored list per contact source, merged on read (contacts record v2)
 
-- **Status:** Proposed (accepted when the founder merges the #9 PR)
+- **Status:** Accepted (the founder merged the #9 PR, #30, on 2026-11-08)
 - **Date:** 2026-11-07
 - **Deciders:** tech lead, founder
 - **Stories:** #9

@@ -14,7 +14,7 @@
 
 - One PR per story, linked with `Closes #N`.
 - Body: **What**, **Why**, **Comment vérifier** (how to check), and notes for the reviewer (env vars, risks).
-- Reviewed by the tech lead, tested by QA on the preview URL, merged by the founder.
+- Reviewed by the tech lead, tested by QA on a local production build (and on the preview when the story needs Vercel, see [TEAM.md](../../TEAM.md) step 4), merged by the founder.
 
 ## Code
 

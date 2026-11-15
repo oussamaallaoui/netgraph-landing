@@ -5,7 +5,7 @@
 - **Project:** `netgraph-landing` on the founder's Vercel account (Hobby plan), linked to `oussamaallaoui/netgraph-landing` on GitHub.
 - **Production:** https://netgraph-landing.vercel.app
 - **Production branch:** `master`. **Every push or merge to `master` deploys to production.**
-- **Previews:** every other branch and every PR gets its own preview URL, posted on the PR. QA tests there.
+- **Previews:** every other branch and every PR gets its own preview URL, posted on the PR. QA tests a local production build, and a preview only when the story needs Vercel (a managed store, an environment variable); the founder gives QA a shareable link to that deployment, in the session, never on GitHub ([TEAM.md](../../TEAM.md) step 4).
 
 Only `netgraph-landing.vercel.app` is public. The `…-oussamaallaoui.vercel.app` addresses are behind Vercel's login (deployment protection), so don't share them.
 
