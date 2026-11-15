@@ -37,13 +37,13 @@ Professionals import their existing contacts (phone, LinkedIn, Instagram, Excel)
 1. **Planning.** The PO proposes a sprint goal and 3–6 stories with acceptance criteria. The tech lead breaks each story into tasks and flags risks. The founder approves the scope.
 2. **Build.** The two devs work in parallel on separate branches (git worktrees). Each PR includes tests and a short "how to check" section.
 3. **Review.** The tech lead reviews every PR against the conventions and the story.
-4. **QA.** The QA engineer tests each PR against the acceptance criteria on its Vercel preview URL, and signs off or files bugs.
+4. **QA.** The QA engineer tests each PR against the acceptance criteria on a **local production build** of the PR branch (`npm ci && npm run build && npm start`), and signs off or files bugs. When a story depends on something that exists only on Vercel (a managed store such as Upstash Redis, an environment variable), QA also tests the PR's **Vercel preview**. Previews are behind Vercel's login and QA has no Vercel account: the founder opens the preview, creates a shareable link for that deployment (**Share** in the Vercel toolbar or on the deployment page) and gives it to QA directly in the session, never on GitHub (the repo is public). The link opens that one deployment only; it gives no access to the dashboard, the logs or the environment variables, so no secret is shared. Checks that need the dashboard (Vercel logs) stay with the founder.
 5. **Merge.** Only the founder merges (production deploys on every push to `master`).
 6. **Demo and retro.** The PO writes what shipped, what didn't and why in the sprint notes.
 
 ## Definition of done
 
-- Acceptance criteria met and checked by QA on the preview deployment
+- Acceptance criteria met and checked by QA on a local production build, and on the preview deployment when the story needs Vercel (see step 4)
 - Tests added and passing (`npm test`, `npm run build`)
 - Reviewed by the tech lead
 - No console errors; keyboard and screen-reader basics work; text contrast ≥ 4.5:1 for anything new
