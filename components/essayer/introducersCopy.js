@@ -52,7 +52,58 @@ export function notFoundNotice(companyLabel) {
 }
 
 /**
- * What the introducer area says first: the count line (found), the notice (not_found), or null.
+ * The groups a found_many result shows: those with at least one person, in the lib's order.
+ * @param {import('../../lib/types.js').IntroducersResult | null | undefined} intro
+ * @returns {import('../../lib/types.js').IntroducerGroup[]}
+ */
+export function shownGroups(intro) {
+  if (!intro || intro.status !== 'found_many' || !Array.isArray(intro.groups)) return []
+  return intro.groups.filter((g) => g && Array.isArray(g.people) && g.people.length > 0)
+}
+
+/**
+ * found_many, above the first block (PO comment 6941141489 §1a). Always plural: groupsTotal ≥ 2.
+ * @param {number} groupsTotal   companies matching the name
+ * @param {number} shown         companies shown as blocks
+ */
+export function foundManyIntro(groupsTotal, shown) {
+  const head = `Le nom que vous citez correspond à ${groupsTotal} entreprises de votre fichier.`
+  return groupsTotal > shown ? `${head} Voici les ${shown} où vous connaissez le plus de personnes.` : head
+}
+
+/**
+ * found_many, once under the last block when companies are left out (PO §1c), or null.
+ * @param {number} hidden   groupsTotal minus the groups shown
+ */
+export function foundManyOverflow(hidden) {
+  const n = Number.isFinite(hidden) ? Math.floor(hidden) : 0
+  if (n <= 0) return null
+  if (n === 1) {
+    return '1 autre entreprise de votre fichier correspond aussi à ce nom. Pour la voir, citez son nom complet.'
+  }
+  return `${n} autres entreprises de votre fichier correspondent aussi à ce nom. Pour les voir, citez leur nom complet.`
+}
+
+/**
+ * The groups, intro line and overflow line of a found_many result, or null when it shows nothing.
+ * @param {import('../../lib/types.js').IntroducersResult | null | undefined} intro
+ * @returns {{ groups: import('../../lib/types.js').IntroducerGroup[], intro: string, overflow: string | null } | null}
+ */
+export function foundManyLines(intro) {
+  const groups = shownGroups(intro)
+  if (groups.length === 0) return null
+  const declared = Number.isFinite(intro.groupsTotal) ? Math.floor(intro.groupsTotal) : 0
+  const total = Math.max(declared, groups.length)
+  return {
+    groups,
+    intro: foundManyIntro(total, groups.length),
+    overflow: foundManyOverflow(total - groups.length),
+  }
+}
+
+/**
+ * What the introducer area says first: the count line (found), the intro line (found_many),
+ * the notice (not_found), or null.
  * @param {import('../../lib/types.js').IntroducersResult | null | undefined} intro
  */
 export function introducersMessage(intro) {
@@ -60,6 +111,7 @@ export function introducersMessage(intro) {
   if (intro.status === 'found' && Array.isArray(intro.people) && intro.people.length > 0) {
     return introducersCountLine(intro.total ?? intro.people.length, intro.companyLabel)
   }
+  if (intro.status === 'found_many') return foundManyLines(intro)?.intro ?? null
   if (intro.status === 'not_found') return notFoundNotice(intro.companyLabel)
   return null
 }
