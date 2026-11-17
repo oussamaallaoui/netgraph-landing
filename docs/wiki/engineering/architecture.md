@@ -67,7 +67,8 @@ lib/                         pure functions, no React, no DOM (except store.js)
   company.js                 companyKey (legal suffixes, case, accents)
   vocabulary.js              concepts and synonyms (FR/EN), example requests
   match.js                   buildIndex, match
-  introducers.js             introducers
+  introducers.js             introducers → found | found_many (short name shared by several companies, #35:
+                             groups ≤ MAX_GROUPS, groupsTotal) | not_found | no_company
   explain.js                 « pourquoi » sentences from structured reasons
   drafts.js                  draftMessage, requestClause, linkedInProfileUrl, mailtoUrl, DRAFT_COPY, MAX_MAILTO_LENGTH,
                              whatsappUrl, MAX_WHATSAPP_URL_LENGTH (#9)
