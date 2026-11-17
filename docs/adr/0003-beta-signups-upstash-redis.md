@@ -1,6 +1,6 @@
 # 0003. Beta signups in Upstash Redis: one key per address, written with SET NX over REST
 
-- **Status:** Proposed (accepted when the founder merges the #11 PR)
+- **Status:** Accepted (effective when the founder merges the #11 PR, #41)
 - **Date:** 2026-11-15
 - **Deciders:** tech lead, founder
 - **Stories:** #11 (and #12, which describes this storage to visitors)
@@ -39,6 +39,7 @@ Choices made here are hard to reverse: the key format and the record shape are t
 
 **Bad / accepted**
 - A REST call is slower than a warm TCP connection (a few tens of milliseconds). Irrelevant at signup volume.
+- The client retries a failed request **2** times (default backoff, about 0.2 s) and gives up after **3 s** per request (`signal: () => AbortSignal.timeout(3000)`, function form only: with a plain `AbortSignal`, `@upstash/redis` 1.41.0 swallows the abort instead of throwing). An outage answers `500` (`network`) within a few seconds instead of waiting for the function's maximum duration. `SET … NX` is safe to retry: a write that landed makes the retry return `null`, and the answer is the same `200`.
 - The email is in the key, readable by anyone with access to the Upstash console. Only the founder has it. Hashing the key would hide it there, but the email is in the value anyway, and deleting by address would need a hash computed by hand.
 - No server-side count is available to the site. That matches founder decision 2 (no number shown).
 - The data lives with a third-party processor (Upstash). Its region and encryption at rest must be confirmed by the founder and given to the legal reviewer (#11, #12). If the database is outside the region the reviewer wants, it should be recreated **before** the first real signup, when it costs nothing.
