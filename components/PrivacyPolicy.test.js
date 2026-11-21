@@ -36,9 +36,11 @@ describe('PrivacyPolicy', () => {
       'la date de votre inscription ;',
       "l'origine de votre inscription (aujourd'hui, toujours la page d'accueil de NetGraph).",
     ])
-    expect(text).toContain(
-      "C'est tout. Votre inscription ne contient ni votre adresse IP, ni d'informations sur votre navigateur.",
+    expect(tags('p')).toContain(
+      "Votre inscription ne contient ni votre adresse IP, ni d'informations sur votre navigateur. " +
+        'Notre hébergeur en garde toutefois une trace technique, expliquée plus bas dans « Où elles sont conservées ».',
     )
+    expect(text).not.toContain("C'est tout.")
   })
 
   it('says company and role are also used to choose whom to invite first (founder, 2026-11-21)', () => {
@@ -63,6 +65,20 @@ describe('PrivacyPolicy', () => {
     )
     expect(text).toContain(
       "Le site est hébergé par Vercel : votre inscription passe par ses serveurs avant d'être enregistrée.",
+    )
+  })
+
+  it("says Vercel's request logs hold the IP address and browser, in its own paragraph after the Vercel sentence", () => {
+    const paragraphs = tags('p')
+    const vercel = paragraphs.indexOf(
+      "Le site est hébergé par Vercel : votre inscription passe par ses serveurs avant d'être enregistrée.",
+    )
+    expect(vercel).toBeGreaterThan(-1)
+    expect(paragraphs[vercel + 1]).toBe(
+      'Comme tout hébergeur, Vercel enregistre chaque visite du site dans des journaux techniques, y compris quand ' +
+        'vous vous inscrivez. Ces journaux contiennent notamment votre adresse IP et des informations sur votre ' +
+        'navigateur. Ils sont séparés de votre inscription. Vercel les conserve pendant une durée limitée, qui ' +
+        "dépend de Vercel : nous la confirmerons et l'indiquerons sur cette page.",
     )
   })
 
@@ -91,9 +107,18 @@ describe('PrivacyPolicy', () => {
     )
   })
 
-  it('says there are no cookies and shows the update date', () => {
-    expect(text).toContain("Ce site ne dépose aucun cookie et n'utilise ni outil de mesure d'audience")
-    expect(text).toContain('Dernière mise à jour : 21 novembre 2026')
+  // True for the whole site only once #44 (self-hosted Inter, no Google Fonts @import) is merged.
+  it('says there are no cookies and no resource from another site (after #44)', () => {
+    expect(tags('p')).toContain(
+      "Ce site ne dépose aucun cookie et n'utilise ni outil de mesure d'audience, ni publicité. " +
+        "Il ne charge aucune ressource d'un autre site : ni script, ni police, ni image. " +
+        "C'est pourquoi aucune bannière de cookies ne s'affiche.",
+    )
+  })
+
+  it('shows the date of the approved wording', () => {
+    expect(tags('p')).toContain('Dernière mise à jour : 22 novembre 2026')
+    expect(text).not.toContain('21 novembre 2026')
   })
 
   it('links the contact address by mailto and has a focusable link back home', () => {
@@ -106,7 +131,9 @@ describe('PrivacyPolicy', () => {
     expect(links.every(x => x.a.includes('focus-visible:outline-violet'))).toBe(true)
   })
 
-  it('uses no text colour below 4.5:1 and loads nothing from another origin', () => {
+  // Checks this component's markup only. It can't see what the built page loads (global CSS, fonts):
+  // QA's network check on a production build covers the whole page.
+  it("uses no text colour below 4.5:1, and the component's own markup has no external URL or script", () => {
     expect(html).not.toMatch(/text-gray-400|text-signal/)
     expect(html).not.toMatch(/(src|href)="https?:/)
     expect(html).not.toContain('<script')

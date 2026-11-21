@@ -1,7 +1,8 @@
 // Body of /confidentialite (#12). Static, no client code. Copy: PO text on issue #12 (to be checked by
 // the legal review), plus the founder's 2026-11-21 addition in « Pourquoi nous les utilisons ».
 // If what the signup stores (#11) changes, this page and SignupPrivacyNotice change in the same PR.
-// [RESPONSABLE] is a placeholder the founder fills before merge.
+// [RESPONSABLE] is a placeholder the founder fills before merge. « Cookies et traceurs » (no font or
+// script from another site) is true only once #44 (self-hosted Inter) is merged.
 import Link from 'next/link'
 import Logo from './Logo'
 import { FOCUS } from './essayer/ui'
@@ -77,8 +78,8 @@ export default function PrivacyPolicy() {
             ]}
           />
           <p>
-            C&apos;est tout. Votre inscription ne contient ni votre adresse IP, ni d&apos;informations sur votre
-            navigateur.
+            Votre inscription ne contient ni votre adresse IP, ni d&apos;informations sur votre navigateur. Notre
+            hébergeur en garde toutefois une trace technique, expliquée plus bas dans « Où elles sont conservées ».
           </p>
         </Section>
 
@@ -102,6 +103,12 @@ export default function PrivacyPolicy() {
           </p>
           <p>
             Le site est hébergé par Vercel : votre inscription passe par ses serveurs avant d&apos;être enregistrée.
+          </p>
+          <p>
+            Comme tout hébergeur, Vercel enregistre chaque visite du site dans des journaux techniques, y compris quand
+            vous vous inscrivez. Ces journaux contiennent notamment votre adresse IP et des informations sur votre
+            navigateur. Ils sont séparés de votre inscription. Vercel les conserve pendant une durée limitée, qui
+            dépend de Vercel : nous la confirmerons et l&apos;indiquerons sur cette page.
           </p>
         </Section>
 
@@ -153,8 +160,9 @@ export default function PrivacyPolicy() {
 
         <Section title="Cookies et traceurs">
           <p>
-            Ce site ne dépose aucun cookie et n&apos;utilise ni outil de mesure d&apos;audience, ni publicité, ni
-            script d&apos;un autre site. C&apos;est pourquoi aucune bannière de cookies ne s&apos;affiche.
+            Ce site ne dépose aucun cookie et n&apos;utilise ni outil de mesure d&apos;audience, ni publicité. Il ne
+            charge aucune ressource d&apos;un autre site : ni script, ni police, ni image. C&apos;est pourquoi aucune
+            bannière de cookies ne s&apos;affiche.
           </p>
         </Section>
 
@@ -163,7 +171,7 @@ export default function PrivacyPolicy() {
             Si nous changeons la façon dont nous utilisons vos données, nous mettrons cette page à jour et changerons
             la date ci-dessous.
           </p>
-          <p>Dernière mise à jour : 21 novembre 2026</p>
+          <p>Dernière mise à jour : 22 novembre 2026</p>
         </Section>
 
         <p className="mt-12">
