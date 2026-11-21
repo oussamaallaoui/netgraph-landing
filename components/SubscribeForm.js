@@ -9,7 +9,7 @@ import {
   sendSignup,
   subscribeReducer,
 } from './subscribeFlow'
-import { MAX_EMAIL_LENGTH, MAX_FIELD_LENGTH } from '../lib/subscribe.js'
+import { MAX_FIELD_LENGTH } from '../lib/subscribe.js'
 
 const FIELD = `w-full min-w-0 rounded-xl border bg-white px-4 py-3 text-base text-ink placeholder:text-slate
   transition-colors duration-150 motion-reduce:transition-none ${FOCUS}`
@@ -66,7 +66,6 @@ export function SubscribeFormView({ state, ids, headingRef, emailRef, onEdit, on
             name="email"
             autoComplete="email"
             inputMode="email"
-            maxLength={MAX_EMAIL_LENGTH}
             value={values.email}
             onChange={edit('email')}
             placeholder={T.emailPlaceholder}

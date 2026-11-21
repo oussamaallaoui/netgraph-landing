@@ -28,6 +28,19 @@ describe('SubscribeFormView markup', () => {
     expect(out).not.toContain('Une erreur s&#x27;est produite')
   })
 
+  it('the email field has no maxLength: a pasted long address is never cut silently (QA plan A)', () => {
+    const out = html(at({ values: { email: 'a'.repeat(280) + '@netgraph.test' } }))
+    expect(out).toMatch(/<input[^>]*id="f-email"[^>]*>/)
+    expect(out.match(/<input[^>]*id="f-email"[^>]*>/)[0]).not.toMatch(/maxlength/i)
+  })
+
+  it('name and company keep maxLength 100', () => {
+    const out = html(at({ step: 'details', values: VALUES }))
+    for (const f of ['name', 'company']) {
+      expect(out.match(new RegExp(`<input[^>]*id="f-email-${f}"[^>]*>`))[0]).toContain('maxLength="100"')
+    }
+  })
+
   it('aria-invalid goes away once the address is edited', () => {
     const edited = subscribeReducer(at({ emailError: true }), { type: 'edit', field: 'email', value: 'a@b.ma' })
     expect(html(edited)).not.toContain('aria-invalid')

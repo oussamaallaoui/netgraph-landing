@@ -67,6 +67,14 @@ describe('subscribeReducer', () => {
     expect(s.focus).toBe('email')
   })
 
+  it('an address over 254 characters is invalid on the client: the « email invalide » path, not a cut address', () => {
+    const email = 'a'.repeat(250) + '@netgraph.test'
+    expect(email.length).toBeGreaterThan(254)
+    const s = run([...typed({ ...VALUES, email }), { type: 'submitEmail' }])
+    expect(s).toMatchObject({ step: 'email', emailError: true, focus: 'email' })
+    expect(s.values.email).toBe(email)
+  })
+
   it('the error goes away as soon as the address is edited, not when another field is', () => {
     const wrong = run([...typed({ email: 'a@b' }), { type: 'submitEmail' }])
     expect(subscribeReducer(wrong, { type: 'edit', field: 'name', value: 'x' }).emailError).toBe(true)
