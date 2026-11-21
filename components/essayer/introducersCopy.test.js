@@ -2,17 +2,22 @@ import { describe, expect, it } from 'vitest'
 import {
   NOTICE_LABEL_MAX,
   SHOWN_MAX,
+  foundManyIntro,
+  foundManyLines,
+  foundManyOverflow,
   introducersCountLine,
   introducersHeading,
   introducersMessage,
   notFoundNotice,
   searchAnnouncement,
   showsIntroducers,
+  shownGroups,
 } from './introducersCopy'
 import { NO_RESULTS_TITLE, resultsSummary } from './search'
 import { buildIndex, match } from '../../lib/match.js'
 import { introducers, MAX_INTRODUCERS } from '../../lib/introducers.js'
 import { SAMPLE_CONTACTS } from '../../lib/fixtures/sample-contacts.js'
+import { INTRODUCER_CONTACTS } from '../../lib/fixtures/introducer-contacts.js'
 import { EXAMPLE_REQUESTS } from '../../lib/vocabulary.js'
 
 const person = (id) => ({ contact: { id, fullName: id }, why: 'x' })
@@ -114,6 +119,84 @@ describe('searchAnnouncement', () => {
   })
 })
 
+const group = (companyLabel, n, total = n) => ({
+  companyLabel,
+  people: Array.from({ length: n }, (_, i) => person(`${companyLabel}-${i}`)),
+  total,
+})
+const many = (groups, groupsTotal = groups.length) => ({
+  status: 'found_many',
+  companyLabel: null,
+  people: [],
+  total: 0,
+  groups,
+  groupsTotal,
+})
+
+describe('found_many copy (#35, PO comment of 2026-11-17)', () => {
+  it('intro line without overflow', () => {
+    expect(foundManyIntro(2, 2)).toBe('Le nom que vous citez correspond à 2 entreprises de votre fichier.')
+    expect(foundManyIntro(3, 3)).toBe('Le nom que vous citez correspond à 3 entreprises de votre fichier.')
+  })
+
+  it('intro line with overflow', () => {
+    expect(foundManyIntro(7, 3)).toBe(
+      'Le nom que vous citez correspond à 7 entreprises de votre fichier. ' +
+        'Voici les 3 où vous connaissez le plus de personnes.',
+    )
+  })
+
+  it('overflow line: none, singular, plural', () => {
+    expect(foundManyOverflow(0)).toBeNull()
+    expect(foundManyOverflow(1)).toBe(
+      '1 autre entreprise de votre fichier correspond aussi à ce nom. Pour la voir, citez son nom complet.',
+    )
+    expect(foundManyOverflow(4)).toBe(
+      '4 autres entreprises de votre fichier correspondent aussi à ce nom. Pour les voir, citez leur nom complet.',
+    )
+  })
+
+  it('foundManyLines: 2 groups, no overflow', () => {
+    const lines = foundManyLines(many([group('Assurances Exempla', 2), group('Exempla Média', 1)]))
+    expect(lines.groups.map((g) => g.companyLabel)).toEqual(['Assurances Exempla', 'Exempla Média'])
+    expect(lines.intro).toBe('Le nom que vous citez correspond à 2 entreprises de votre fichier.')
+    expect(lines.overflow).toBeNull()
+  })
+
+  it('foundManyLines: 3 groups shown out of 4 → singular overflow', () => {
+    const lines = foundManyLines(many([group('A', 3), group('B', 2), group('C', 1)], 4))
+    expect(lines.intro).toMatch(/correspond à 4 entreprises de votre fichier\. Voici les 3 où/)
+    expect(lines.overflow).toBe(foundManyOverflow(1))
+  })
+
+  it('foundManyLines: a groupsTotal below the groups shown never yields a negative count', () => {
+    const lines = foundManyLines(many([group('A', 1), group('B', 1)], 0))
+    expect(lines.intro).toBe(foundManyIntro(2, 2))
+    expect(lines.overflow).toBeNull()
+  })
+
+  it('shownGroups drops empty groups; nothing to show gives null', () => {
+    expect(shownGroups(many([group('A', 2), group('B', 0)])).map((g) => g.companyLabel)).toEqual(['A'])
+    expect(foundManyLines(many([]))).toBeNull()
+    expect(foundManyLines(found(3))).toBeNull()
+  })
+
+  it('introducersMessage / showsIntroducers / searchAnnouncement: intro line, then the #6 summary', () => {
+    const r = many([group('Assurances Exempla', 2), group('Exempla Média', 1)])
+    expect(introducersMessage(r)).toBe(foundManyIntro(2, 2))
+    expect(showsIntroducers(r)).toBe(true)
+    expect(searchAnnouncement(r, 5)).toBe(
+      'Le nom que vous citez correspond à 2 entreprises de votre fichier. 5 personnes de votre réseau peuvent vous aider',
+    )
+    // The per-group count lines are not read in the status (PO §1d).
+    expect(searchAnnouncement(r, 5)).not.toMatch(/travaille/)
+    expect(searchAnnouncement(many([group('A', 1), group('B', 1), group('C', 1)], 7), 0)).toBe(
+      `${foundManyIntro(7, 3)} ${NO_RESULTS_TITLE}`,
+    )
+    expect(showsIntroducers(many([]))).toBe(false)
+  })
+})
+
 // The screen relies on these properties of lib/introducers.js on the sample data.
 describe('introducer area on the sample data', () => {
   const index = buildIndex(SAMPLE_CONTACTS)
@@ -157,5 +240,29 @@ describe('introducer area on the sample data', () => {
     }
     // Sanity: the #6 list is still there for them.
     expect(match('Recruter un auditeur financier', index).results.length).toBeGreaterThan(0)
+  })
+})
+
+// The PO's two examples (#35, comment of 2026-11-17), on the real lib output.
+describe('found_many on the sample data and the QA file', () => {
+  it('« chez Exempla » (sample): 2 companies, no overflow', () => {
+    const r = introducers("Rencontrer quelqu'un chez Exempla", buildIndex(SAMPLE_CONTACTS))
+    const lines = foundManyLines(r)
+    expect(lines.groups.map((g) => g.companyLabel)).toEqual(['Assurances Exempla', 'Exempla Média'])
+    expect(lines.intro).toBe('Le nom que vous citez correspond à 2 entreprises de votre fichier.')
+    expect(lines.overflow).toBeNull()
+  })
+
+  it('« chez Démo » (sample + QA file): 3 companies shown out of 7, plural overflow', () => {
+    const r = introducers("Rencontrer quelqu'un chez Démo", buildIndex([...SAMPLE_CONTACTS, ...INTRODUCER_CONTACTS]))
+    const lines = foundManyLines(r)
+    expect(lines.groups).toHaveLength(3)
+    expect(lines.intro).toBe(
+      'Le nom que vous citez correspond à 7 entreprises de votre fichier. ' +
+        'Voici les 3 où vous connaissez le plus de personnes.',
+    )
+    expect(lines.overflow).toBe(
+      '4 autres entreprises de votre fichier correspondent aussi à ce nom. Pour les voir, citez leur nom complet.',
+    )
   })
 })
