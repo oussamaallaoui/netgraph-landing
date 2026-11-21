@@ -1,26 +1,18 @@
 import { NextResponse } from 'next/server'
-import fs from 'fs'
-import path from 'path'
 import { validateSignup, MAX_BODY_BYTES } from '../../../lib/subscribe.js'
+import { getRedis } from '../../../lib/redis.js'
+import { addSignup, errorCategory } from '../../../lib/signups.js'
 
-// Beta signup (#10). POST only: there is no GET handler, so Next.js answers 405 to GET/HEAD/PUT/…
-// and nobody can read the list through the API. Nothing about a subscriber is ever logged.
-// Storage is still a local file, which fails on Vercel's read-only filesystem (#11).
+// Beta signup (#10, #11). POST only: there is no GET handler, so Next.js answers 405 to
+// GET/HEAD/PUT/… and nobody can read the list through the API.
+//
+// Signups are stored in Upstash Redis (ADR 0003), one key per address, with SET NX. A new
+// address and one already signed up get the same status, headers and body, so nobody can learn
+// whether a given person signed up. Nothing about a subscriber is ever logged: a storage failure
+// logs one fixed line with a category from a closed list, never the error or its message.
 
-const FILE = path.join(process.cwd(), 'subscribers.json')
-
-function load() {
-  try {
-    const data = JSON.parse(fs.readFileSync(FILE, 'utf8'))
-    return Array.isArray(data) ? data : []
-  } catch {
-    return []
-  }
-}
-
-function save(data) {
-  fs.writeFileSync(FILE, JSON.stringify(data, null, 2))
-}
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 const invalidRequest = () => NextResponse.json({ error: 'Requête invalide' }, { status: 400 })
 
@@ -54,23 +46,15 @@ export async function POST(req) {
       ? NextResponse.json({ error: 'Email invalide' }, { status: 400 })
       : invalidRequest()
   }
-  const { email, name, company, role } = result.value
-
-  const list = load()
-
-  if (list.some(s => typeof s?.email === 'string' && s.email.toLowerCase() === email)) {
-    return NextResponse.json({ error: 'Déjà inscrit' }, { status: 409 })
-  }
-
-  list.push({ email, name, company, role, date: new Date().toISOString(), source: 'landing' })
 
   try {
-    save(list)
+    // Missing env vars throw in getRedis(): same clean 500 as a storage failure.
+    // The result ({ created }) is deliberately ignored: same answer either way.
+    await addSignup(getRedis(), result.value)
   } catch (err) {
-    // One fixed line, the error code only: never the error object, its message or the body.
-    console.error('subscribe: save failed', err?.code ?? 'unknown')
+    console.error('subscribe: save failed', errorCategory(err))
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 
-  return NextResponse.json({ success: true, total: list.length })
+  return NextResponse.json({ success: true })
 }
