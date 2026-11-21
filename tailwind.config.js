@@ -11,8 +11,8 @@ module.exports = {
         signal: '#00C37A',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Cal Sans', 'Inter', 'sans-serif'],
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: ['Cal Sans', 'var(--font-inter)', 'sans-serif'],
       },
     },
   },

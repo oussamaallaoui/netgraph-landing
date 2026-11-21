@@ -21,7 +21,7 @@ Inside the browser, on /essayer (Sprint 1, phone contacts since #9):
   Nothing about contacts or requests is sent to any server.
 ```
 
-- **Stack:** Next.js 14.2, React 18, Tailwind CSS 3, Inter from Google Fonts.
+- **Stack:** Next.js 14.2, React 18, Tailwind CSS 3, Inter self-hosted with `next/font/google` (downloaded at build time and served from our domain, so visitors never contact Google; #44).
 - **Styling:** Tailwind tokens in `tailwind.config.js` (`ink`, `slate`, `mist`, `violet`, `signal`), matching the [design system](../design/design-system.md).
 - **Hosting:** Vercel, see [Deployment](deployment.md). Every merge to `master` is public immediately, so each story must be presentable on its own when merged.
 
