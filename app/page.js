@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import SignupPrivacyNotice from '../components/SignupPrivacyNotice'
 
 // ── Données ──────────────────────────────────────────────────────
 
@@ -384,6 +385,7 @@ function SubscribeForm() {
           <option>Autre</option>
         </select>
       </div>
+      <SignupPrivacyNotice />
       <button type="submit" disabled={loading}
         className="w-full py-3 rounded-xl bg-violet text-white text-sm font-medium
           hover:bg-violet-dark transition-colors disabled:opacity-60">

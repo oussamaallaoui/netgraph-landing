@@ -9,6 +9,7 @@ Browser ──> Vercel (Next.js 14, App Router)
               ├─ app/page.js          landing page (client component)
               ├─ app/layout.js        metadata, global CSS
               ├─ app/essayer/         Sprint 1: import → request → results → draft (client-side only)
+              ├─ app/confidentialite/ #12: static privacy page (server component, text in components/PrivacyPolicy.js)
               └─ app/api/subscribe    POST: beta signup (GET removed, #10)
                     └─ subscribers.json   local file — doesn't work on Vercel (#11)
 
