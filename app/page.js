@@ -3,19 +3,20 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
 import BetaSignupNotice from '../components/BetaSignupNotice' // #47: removed when #11 (PR #41) merges
+import FictionalExampleNote from '../components/FictionalExampleNote'
 // ── Données ──────────────────────────────────────────────────────
 
 // Votre réseau : vous, vos contacts (1er degré) et leurs contacts (2e degré)
 const ME = { id: 'me', x: 110, y: 210, label: 'Vous' }
 
 const NODES = [
-  { id: 'sara',   x: 300, y: 100, label: 'Sara',   org: 'McKinsey',    degree: 1 },
-  { id: 'amine',  x: 290, y: 215, label: 'Amine',  org: 'CIH Bank',    degree: 1 },
-  { id: 'nadia',  x: 300, y: 330, label: 'Nadia',  org: 'Deloitte',    degree: 1 },
-  { id: 'jerome', x: 520, y: 80,  label: 'Jérôme', org: 'BMCE Cap.',   degree: 2 },
-  { id: 'youssef',x: 620, y: 170, label: 'Youssef',org: 'Attijari',    degree: 2 },
-  { id: 'karim',  x: 500, y: 240, label: 'Karim',  org: 'OCP Group',   degree: 2 },
-  { id: 'hanane', x: 530, y: 350, label: 'Hanane', org: 'Finance Is.', degree: 2 },
+  { id: 'sara',   x: 300, y: 100, label: 'Sara',   org: 'Quartzia',    degree: 1 },
+  { id: 'amine',  x: 290, y: 215, label: 'Amine',  org: 'Zélia',       degree: 1 },
+  { id: 'nadia',  x: 300, y: 330, label: 'Nadia',  org: 'Audivia',     degree: 1 },
+  { id: 'jerome', x: 520, y: 80,  label: 'Jérôme', org: 'Nordacap',    degree: 2 },
+  { id: 'youssef',x: 620, y: 170, label: 'Youssef',org: 'Tamsa',       degree: 2 },
+  { id: 'karim',  x: 500, y: 240, label: 'Karim',  org: 'Phosfora',    degree: 2 },
+  { id: 'hanane', x: 530, y: 350, label: 'Hanane', org: 'Iléa',        degree: 2 },
 ]
 
 const EDGES = [
@@ -29,36 +30,30 @@ const REQUESTS = [
   {
     query: 'Trouver ma prochaine mission de conseil en finance',
     path: ['me', 'sara', 'jerome'],
-    who: 'Jérôme D.', role: 'Directeur, BMCE Capital',
+    who: 'Jérôme D.', role: 'Directeur, Nordacap',
     why: 'Lance un appel d\'offres conseil ce trimestre',
     via: 'Sara peut vous présenter — vous échangez chaque semaine',
   },
   {
-    query: 'Être présenté à quelqu\'un chez OCP',
+    query: 'Être présenté à quelqu\'un chez Phosfora',
     path: ['me', 'amine', 'karim'],
-    who: 'Karim B.', role: 'Responsable achats, OCP Group',
+    who: 'Karim B.', role: 'Responsable achats, Phosfora',
     why: 'Travaille avec des cabinets de conseil',
     via: 'Amine peut vous présenter — ancien collègue de Karim',
   },
   {
     query: 'Lever des fonds pour ma startup',
     path: ['me', 'nadia', 'hanane'],
-    who: 'Hanane E.', role: 'Partner, Finance Is.',
+    who: 'Hanane E.', role: 'Partner, Fonds Iléa',
     why: 'Investit en amorçage dans la fintech',
     via: 'Nadia peut vous présenter — vous vous parlez chaque mois',
   },
 ]
 
 const RESULTS = [
-  { initials: 'JD', name: 'Jérôme D.', role: 'Directeur, BMCE Capital', path: 'via Sara · 2e degré',  score: 86 },
-  { initials: 'NT', name: 'Nadia T.',  role: 'Senior Manager, Deloitte', path: 'Contact direct · 1er degré', score: 74 },
-  { initials: 'YA', name: 'Youssef A.',role: 'Head of Strategy, Attijariwafa', path: 'via Sara ou Amine · 2e degré', score: 61 },
-]
-
-const TESTIMONIALS = [
-  { name: 'Sara B.', role: 'Associée, McKinsey Maroc', text: 'En 20 minutes j\'ai identifié 3 introductions que j\'aurais mis des mois à faire autrement.' },
-  { name: 'Amine K.', role: 'Dir. Corporate Finance, CIH Bank', text: 'La relation cachée entre deux de mes contacts a abouti sur un mandat. Je n\'aurais jamais fait le lien.' },
-  { name: 'Nadia T.', role: 'Senior Manager, Deloitte', text: 'L\'équipe utilise NetGraph chaque semaine pour le BD. Le ROI est immédiat.' },
+  { initials: 'JD', name: 'Jérôme D.', role: 'Directeur, Nordacap', path: 'via Sara · 2e degré',  score: 86 },
+  { initials: 'NT', name: 'Nadia T.',  role: 'Senior Manager, Audivia', path: 'Contact direct · 1er degré', score: 74 },
+  { initials: 'YA', name: 'Youssef A.',role: 'Head of Strategy, Banque Tamsa', path: 'via Sara ou Amine · 2e degré', score: 61 },
 ]
 
 // ── Composants ───────────────────────────────────────────────────
@@ -233,7 +228,7 @@ function AgentCard() {
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-violet-light text-violet text-sm font-semibold flex items-center justify-center flex-shrink-0">SB</div>
           <div className="min-w-0">
-            <p className="text-sm text-ink"><span className="font-semibold">Sara B.</span> · Associée, McKinsey Maroc</p>
+            <p className="text-sm text-ink"><span className="font-semibold">Sara B.</span> · Associée, Quartzia Conseil</p>
             <p className="text-xs text-slate mt-0.5">
               Vous échangez tous les 10 jours en moyenne. Dernier message il y a 5 semaines.
             </p>
@@ -243,7 +238,7 @@ function AgentCard() {
         <div className="rounded-2xl bg-mist p-4 text-sm text-ink leading-relaxed">
           Bonjour Sara, j'espère que tout va bien depuis notre dernier échange !
           Je cherche une mission de conseil en finance et j'ai vu que tu travailles
-          avec Jérôme chez BMCE Capital. Accepterais-tu de nous mettre en relation ?
+          avec Jérôme chez Nordacap. Accepterais-tu de nous mettre en relation ?
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
@@ -511,9 +506,7 @@ export default function LandingPage() {
             </div>
             <RequestGraph />
           </div>
-          <p className="text-center text-xs text-gray-400 mt-3">
-            Exemple de démonstration — noms et entreprises fictifs
-          </p>
+          <FictionalExampleNote />
         </div>
       </section>
 
@@ -563,6 +556,7 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+          <FictionalExampleNote />
         </div>
       </section>
 
@@ -629,28 +623,9 @@ export default function LandingPage() {
               ))}
             </ul>
           </div>
-          <AgentCard />
-        </div>
-      </section>
-
-      {/* ── Témoignages ── */}
-      <section className="py-16 px-6 bg-mist">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-semibold text-ink text-center mb-10">
-            Ce que disent les premiers utilisateurs
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-5">
-            {TESTIMONIALS.map((t, i) => (
-              <div key={i} className="bg-white rounded-2xl p-5 border border-white/50">
-                <p className="text-sm text-slate leading-relaxed mb-4 italic">
-                  "{t.text}"
-                </p>
-                <div>
-                  <p className="font-medium text-ink text-sm">{t.name}</p>
-                  <p className="text-xs text-gray-400">{t.role}</p>
-                </div>
-              </div>
-            ))}
+          <div>
+            <AgentCard />
+            <FictionalExampleNote />
           </div>
         </div>
       </section>
@@ -701,7 +676,7 @@ export default function LandingPage() {
               <line x1="11" y1="9" x2="4"  y2="14" stroke="#4B3FCC" strokeWidth="1.5" opacity=".4"/>
               <line x1="11" y1="9" x2="18" y2="14" stroke="#4B3FCC" strokeWidth="1.5" opacity=".4"/>
             </svg>
-            <span className="text-sm text-slate">NetGraph © 2025</span>
+            <span className="text-sm text-slate">NetGraph © 2026</span>
           </div>
           <p className="text-xs text-gray-400">
             Casablanca, Maroc · contact@netgraph.app

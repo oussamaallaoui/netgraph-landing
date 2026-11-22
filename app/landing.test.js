@@ -62,3 +62,64 @@ describe('#48 — promises', () => {
     expect(html).toMatch(/<div class="[^"]*text-slate[^"]*"><span[^>]*><svg[^>]*aria-hidden="true"[^>]*>.*?<\/svg>Aucune carte requise<\/span>/)
   })
 })
+
+// The demo rotates through REQUESTS and only the first one is in the server HTML, so the name checks
+// read the source of app/page.js too.
+describe('#34 — fictional example', () => {
+  const REAL_NAMES = /McKinsey|CIH Bank|Deloitte|BMCE|Attijari|\bOCP\b|Finance Is\./
+  const NOTE = 'Exemple fictif — noms et entreprises inventés'
+
+  it('names no real company, in the source or in the HTML', () => {
+    expect(source).not.toMatch(REAL_NAMES)
+    expect(html).not.toMatch(REAL_NAMES)
+  })
+
+  it('labels the graph nodes with the short fictional names', () => {
+    const orgs = [...source.matchAll(/org: '([^']+)'/g)].map(m => m[1])
+    expect(orgs).toEqual(['Quartzia', 'Zélia', 'Audivia', 'Nordacap', 'Tamsa', 'Phosfora', 'Iléa'])
+  })
+
+  it('uses the full fictional names in the requests, the results and the agent card', () => {
+    expect(source.match(/'Directeur, Nordacap'/g)).toHaveLength(2)
+    for (const text of [
+      "'Responsable achats, Phosfora'",
+      "'Partner, Fonds Iléa'",
+      "'Senior Manager, Audivia'",
+      "'Head of Strategy, Banque Tamsa'",
+      "'Être présenté à quelqu\\'un chez Phosfora'",
+    ]) {
+      expect(source).toContain(text)
+    }
+    expect(html).toContain('Associée, Quartzia Conseil')
+    expect(html).toContain('Jérôme chez Nordacap.')
+  })
+
+  it('no longer shows the testimonials', () => {
+    expect(html).not.toContain('Ce que disent les premiers utilisateurs')
+    expect(source).not.toContain('TESTIMONIALS')
+  })
+
+  it('marks each of the three examples as fictional, in a readable colour', () => {
+    expect(html.split(`<p class="text-center text-xs text-slate mt-3">${NOTE}</p>`)).toHaveLength(4)
+    expect(html.split(NOTE)).toHaveLength(4)
+    expect(html).not.toContain('Exemple de démonstration')
+    // one note right after each example, in page order
+    const at = (s) => html.indexOf(s)
+    const notes = [...html.matchAll(new RegExp(NOTE, 'g'))].map(m => m.index)
+    expect(at('Nouvelle demande')).toBeLessThan(notes[0])
+    expect(notes[0]).toBeLessThan(at('Une demande, les bonnes personnes, classées'))
+    expect(at('Head of Strategy, Banque Tamsa')).toBeLessThan(notes[1])
+    expect(notes[1]).toBeLessThan(at('De votre besoin à la bonne introduction'))
+    expect(at('Jérôme chez Nordacap')).toBeLessThan(notes[2])
+    expect(notes[2]).toBeLessThan(at('id="beta"'))
+  })
+
+  it('shows © 2026 in the footer', () => {
+    expect(html).toContain('NetGraph © 2026')
+    expect(html).not.toContain('© 2025')
+  })
+
+  it('never calls the beta free (pricing not decided)', () => {
+    expect(html).not.toMatch(/gratuit/i)
+  })
+})

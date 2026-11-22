@@ -88,8 +88,8 @@ Accepted limits of the `.vcf` import and « Ouvrir dans WhatsApp » (`lib/vcard.
 
 - **A name, company or role over 100 characters** makes the signup fail with the generic « Une erreur s'est produite. Réessayez. » (`400 Requête invalide`, #10). The form has no `maxLength` on these fields; adding `maxLength={100}` is a frontend follow-up if the PO wants it.
 - Some text is below 4.5:1 contrast: `gray-400` fine print and captions, and `signal` green text in the beta pill. See the design system's colour notes. (Backlog item "Corriger les contrastes insuffisants et l'année du pied de page", no issue yet.)
-- The footer still says "© 2025". (In #34.)
-- The landing page demo and testimonials use **real company names** (McKinsey, CIH Bank, Deloitte, BMCE Capital, Attijariwafa, OCP Group) with invented quotes attributed to people at those firms. Flagged on 2026-10-27; now #34 (backlog, outside Sprint 4). Sprint 1 fixtures use only invented companies.
+- ~~The footer still says "© 2025".~~ Fixed in #34 (Sprint 5): the footer says « NetGraph © 2026 ».
+- ~~The landing page demo and testimonials use **real company names** (McKinsey, CIH Bank, Deloitte, BMCE Capital, Attijariwafa, OCP Group) with invented quotes attributed to people at those firms.~~ Fixed in #34 (Sprint 5): the demo, the ranked results and the agent card use only invented companies (Quartzia Conseil, Banque Zélia, Audivia, Nordacap, Banque Tamsa, Phosfora, Fonds Iléa), each with « Exemple fictif — noms et entreprises inventés » under it, and the testimonials section is removed until real quotes are collected with written consent. The names were not checked against a company register.
 
 ## Beta signups closed until #11 (#47)
 
