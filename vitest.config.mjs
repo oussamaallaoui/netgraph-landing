@@ -7,7 +7,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   esbuild: {
     loader: 'jsx',
-    include: /components\/.*\.js$/,
+    include: /(components\/.*|app\/page)\.js$/,
     exclude: [],
     jsx: 'automatic',
   },
