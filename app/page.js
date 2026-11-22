@@ -473,7 +473,7 @@ export default function LandingPage() {
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </a>
-            <p className="text-xs text-gray-400 mt-2">Gratuit · Aucune carte requise · Accès en 7 jours</p>
+            <p className="text-xs text-slate mt-2">Aucune carte requise · Essai sans inscription</p>
             <Link href="/essayer"
               className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium
                 text-violet hover:bg-violet-light transition-colors motion-reduce:transition-none
@@ -660,16 +660,15 @@ export default function LandingPage() {
         <div className="max-w-lg mx-auto">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
-              bg-signal/10 text-signal text-xs font-medium mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-signal animate-pulse"/>
-              Beta ouverte — accès gratuit pendant 3 mois
+              bg-violet-light text-violet text-xs font-medium mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-signal"/>
+              Beta en préparation
             </div>
             <h2 className="text-2xl sm:text-3xl font-semibold text-ink mb-3">
               Les inscriptions ouvrent bientôt
             </h2>
             <p className="text-slate text-sm leading-relaxed">
-              Les 100 premiers inscrits ont accès gratuitement pendant 3 mois,
-              avec un onboarding personnalisé sur leurs propres données.
+              Les premiers inscrits seront contactés en priorité à l'ouverture de la beta.
             </p>
           </div>
 
@@ -678,10 +677,10 @@ export default function LandingPage() {
           </div>
 
           {/* Garanties */}
-          <div className="flex items-center justify-center gap-x-6 gap-y-2 flex-wrap mt-6 text-xs text-gray-400">
-            {['Aucune carte requise', 'Données 100% privées', 'Aucun message sans votre accord'].map(g => (
+          <div className="flex items-center justify-center gap-x-6 gap-y-2 flex-wrap mt-6 text-xs text-slate">
+            {['Aucune carte requise', 'Vos contacts restent sur votre appareil', 'Aucun message sans votre accord'].map(g => (
               <span key={g} className="flex items-center gap-1">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                   <path d="M2 6l3 3 5-5" stroke="#00C37A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 {g}
