@@ -151,7 +151,7 @@ function RequestGraph() {
           <g>
             <circle cx={ME.x} cy={ME.y} r={32} fill="#0E0E0E" />
             <text x={ME.x} y={ME.y + 4} textAnchor="middle" fontSize={12} fontWeight={600}
-              fill="#fff" fontFamily="Inter, sans-serif">Vous</text>
+              fill="#fff" className="font-sans">Vous</text>
           </g>
 
           {NODES.map(n => {
@@ -168,12 +168,12 @@ function RequestGraph() {
                   style={{ transition: 'all .4s ease' }} />
                 <text x={n.x} y={n.y - 4} textAnchor="middle" fontSize={12} fontWeight={600}
                   fill={isTarget ? '#fff' : reached ? '#4B3FCC' : '#374151'}
-                  fontFamily="Inter, sans-serif" style={{ transition: 'fill .4s ease' }}>
+                  className="font-sans" style={{ transition: 'fill .4s ease' }}>
                   {n.label}
                 </text>
                 <text x={n.x} y={n.y + 11} textAnchor="middle" fontSize={9}
                   fill={isTarget ? 'rgba(255,255,255,.85)' : '#6B7280'}
-                  fontFamily="Inter, sans-serif" style={{ transition: 'fill .4s ease' }}>
+                  className="font-sans" style={{ transition: 'fill .4s ease' }}>
                   {n.org}
                 </text>
               </g>
