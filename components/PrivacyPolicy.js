@@ -1,8 +1,8 @@
 // Body of /confidentialite (#12). Static, no client code. Copy: PO text on issue #12 (to be checked by
 // the legal review), plus the founder's 2026-11-21 addition in « Pourquoi nous les utilisons ».
 // If what the signup stores (#11) changes, this page and SignupPrivacyNotice change in the same PR.
-// [RESPONSABLE] is a placeholder the founder fills before merge. « Cookies et traceurs » (no font or
-// script from another site) is true only once #44 (self-hosted Inter) is merged.
+// [RESPONSABLE] is a placeholder the founder fills before merge. « Cookies et traceurs » (no script, font
+// or image from another site) stays true only while none is added; if one is, update this page in that PR.
 import Link from 'next/link'
 import Logo from './Logo'
 import { FOCUS } from './essayer/ui'
