@@ -43,4 +43,21 @@ Rules 2–4 below (ownership, second-degree consent, server-side deletion) apply
 
 ## Beta signups
 
-The landing page collects email, name, company and role (optional, 100 characters each), with a promise of "Données 100% privées". Since #10 (Sprint 3), the API never returns the subscriber list (`GET /api/subscribe` answers `405`; there is no list in the app) and nothing about a subscriber is logged: a storage failure logs only `subscribe: save failed <code>`. Signups still can't be saved on Vercel (#11); once they are, only the founder reads them, in the Upstash console behind their Vercel login. Still open: « Cet email est déjà inscrit » reveals whether an address signed up, to be fixed with or before #11 (see [Known issues](../engineering/known-issues.md)). A privacy notice for the signup form is #12.
+The landing page collects email, name, company and role (optional, 100 characters each), with a promise of "Données 100% privées". A privacy notice for the signup form is #12.
+
+**What is stored (#11, [ADR 0003](../../adr/0003-beta-signups-upstash-redis.md)).** One record per address in Upstash Redis (a third-party processor, connected to the Vercel project): `{ v: 1, email, name, company, role, date, source: 'landing' }`. Nothing else: no IP address, no user agent, no counter. The key is `signup:<email>` in production (`preview:signup:<email>` for tests on previews). No expiry yet: the retention period is a founder decision (#12).
+
+- *To confirm by the founder and give to the legal reviewer:* the database **region** and whether **encryption at rest** is on (question on #11). If the region is wrong, recreate the database **before** the first real signup.
+
+**No enumeration.** An address already signed up gets exactly the same response as a new one (`200 {"success":true}`, same headers), nothing is written and the original signup stays unchanged. The API never returns the list or a count (`GET` answers `405`).
+
+**No logs.** Nothing about a subscriber is logged. A storage failure logs one fixed line, `subscribe: save failed <config|upstash|network|unknown>`, never the error (its message can quote the email).
+
+**Reading and deleting signups (founder only).** In Vercel → Storage → the database → open in Upstash:
+
+- **List:** Data Browser, filter `signup:*`; or in the Upstash CLI: `SCAN 0 MATCH signup:* COUNT 100` (repeat with the returned cursor until it is `0`).
+- **Read one:** `GET signup:<email>` (the address in lower case, as stored).
+- **Delete one** (a subscriber asks to be removed): `DEL signup:<email>`. `1` means deleted, `0` that there was no such key (check the spelling, lower case).
+- **Purge preview test data:** `SCAN 0 MATCH preview:signup:* COUNT 100`, then `DEL` each key. Never run a pattern delete on `signup:*`.
+
+QA uses fake addresses only (`test+qa1@netgraph.test`).

@@ -1,6 +1,7 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import SubscribeForm from '../components/SubscribeForm'
 
 // ── Données ──────────────────────────────────────────────────────
 
@@ -279,121 +280,6 @@ const STEP_ICONS = {
       <path d="M4 5h12v8H9l-3 3v-3H4z" stroke="#4B3FCC" strokeWidth="1.5" strokeLinejoin="round"/>
     </svg>
   ),
-}
-
-function SubscribeForm() {
-  const [step, setStep]     = useState('email')  // email | details | success | error
-  const [email, setEmail]   = useState('')
-  const [name, setName]     = useState('')
-  const [company, setCompany] = useState('')
-  const [role, setRole]     = useState('')
-  const [loading, setLoading] = useState(false)
-  const inputRef = useRef(null)
-
-  useEffect(() => { inputRef.current?.focus() }, [])
-
-  async function handleEmail(e) {
-    e.preventDefault()
-    if (!email.includes('@')) return
-    setStep('details')
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setLoading(true)
-    try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name, company, role }),
-      })
-      const data = await res.json()
-      if (res.ok) {
-        setStep('success')
-      } else if (res.status === 409) {
-        setStep('already')
-      } else {
-        setStep('error')
-      }
-    } catch {
-      setStep('error')
-    }
-    setLoading(false)
-  }
-
-  if (step === 'success') return (
-    <div className="text-center py-6 animate-fade-up">
-      <div className="w-14 h-14 rounded-2xl bg-signal/10 flex items-center justify-center mx-auto mb-4">
-        <span className="text-2xl">✓</span>
-      </div>
-      <p className="font-semibold text-ink text-lg mb-1">Vous êtes sur la liste !</p>
-      <p className="text-slate text-sm">
-        Nous vous contacterons en priorité pour l'accès à la beta.
-      </p>
-    </div>
-  )
-
-  if (step === 'already') return (
-    <div className="text-center py-6">
-      <p className="text-slate text-sm">Cet email est déjà inscrit. On vous recontacte bientôt.</p>
-    </div>
-  )
-
-  if (step === 'error') return (
-    <div className="text-center py-4">
-      <p className="text-red-500 text-sm mb-3">Une erreur s'est produite. Réessayez.</p>
-      <button onClick={() => setStep('email')}
-        className="text-violet text-sm underline">Réessayer</button>
-    </div>
-  )
-
-  if (step === 'email') return (
-    <form onSubmit={handleEmail} className="flex flex-col sm:flex-row gap-3">
-      <input ref={inputRef} type="email" value={email} onChange={e => setEmail(e.target.value)}
-        placeholder="votre@email.com" required
-        className="flex-1 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm
-          text-ink placeholder:text-gray-400 focus:border-violet transition-colors" />
-      <button type="submit"
-        className="px-6 py-3 rounded-xl bg-violet text-white text-sm font-medium
-          hover:bg-violet-dark transition-colors whitespace-nowrap">
-        Rejoindre la beta →
-      </button>
-    </form>
-  )
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-3 animate-fade-up">
-      <div className="grid grid-cols-2 gap-3">
-        <input type="text" value={name} onChange={e => setName(e.target.value)}
-          placeholder="Prénom et nom" required
-          className="px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm
-            text-ink placeholder:text-gray-400 focus:border-violet transition-colors col-span-2" />
-        <input type="text" value={company} onChange={e => setCompany(e.target.value)}
-          placeholder="Entreprise" required
-          className="px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm
-            text-ink placeholder:text-gray-400 focus:border-violet transition-colors" />
-        <select value={role} onChange={e => setRole(e.target.value)} required
-          className="px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm
-            text-ink focus:border-violet transition-colors">
-          <option value="">Votre rôle</option>
-          <option>Direction / C-level</option>
-          <option>Business Development</option>
-          <option>Conseil / Consulting</option>
-          <option>Finance / Investissement</option>
-          <option>Commercial / Vente</option>
-          <option>Autre</option>
-        </select>
-      </div>
-      <button type="submit" disabled={loading}
-        className="w-full py-3 rounded-xl bg-violet text-white text-sm font-medium
-          hover:bg-violet-dark transition-colors disabled:opacity-60">
-        {loading ? 'Inscription…' : 'Confirmer mon inscription →'}
-      </button>
-      <p className="text-xs text-gray-400 text-center">
-        Accès beta gratuit · Aucune carte requise · Invitation dans les 7 jours
-      </p>
-    </form>
-  )
 }
 
 // ── Page principale ───────────────────────────────────────────────
