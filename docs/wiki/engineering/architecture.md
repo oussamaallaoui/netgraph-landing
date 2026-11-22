@@ -66,7 +66,8 @@ lib/                         pure functions, no React, no DOM (except store.js)
   text.js                    normalize, tokenize, stopwords
   company.js                 companyKey (legal suffixes, case, accents)
   vocabulary.js              concepts and synonyms (FR/EN), example requests
-  match.js                   buildIndex, match
+  match.js                   buildIndex, match; shared rule: shortNameKeys in match.js (#35 short names, used by
+                             match for legal forms next to a short name since #56, and by introducers)
   introducers.js             introducers → found | found_many (short name shared by several companies, #35:
                              groups ≤ MAX_GROUPS, groupsTotal) | not_found | no_company
   explain.js                 « pourquoi » sentences from structured reasons
