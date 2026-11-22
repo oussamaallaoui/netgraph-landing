@@ -1,14 +1,20 @@
-import { Inter } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 
-// #44: next/font downloads Inter at build time and serves it from our domain, so no visitor's
-// browser contacts Google. Only the weights the UI uses (design system: 400, 500, 600).
-// The font is exposed as --font-inter, which globals.css and tailwind.config.js (font-sans) use.
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
+// #44, #51: Inter is served from our domain (no visitor's browser contacts Google) and its files
+// are committed in app/fonts/, so the build downloads nothing. Only the weights the UI uses
+// (design system: 400, 500, 600), latin subset. next/font adds a size-adjusted Arial fallback,
+// as the Google loader did before #51. The font is exposed as --font-inter, which globals.css and
+// tailwind.config.js (font-sans) use.
+const inter = localFont({
+  src: [
+    { path: './fonts/inter-latin-400-normal.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/inter-latin-500-normal.woff2', weight: '500', style: 'normal' },
+    { path: './fonts/inter-latin-600-normal.woff2', weight: '600', style: 'normal' },
+  ],
   display: 'swap',
   variable: '--font-inter',
+  adjustFontFallback: 'Arial',
 })
 
 export const metadata = {
