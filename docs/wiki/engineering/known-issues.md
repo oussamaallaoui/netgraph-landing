@@ -90,3 +90,11 @@ Accepted limits of the `.vcf` import and « Ouvrir dans WhatsApp » (`lib/vcard.
 - Some text is below 4.5:1 contrast: `gray-400` fine print and captions, and `signal` green text in the beta pill. See the design system's colour notes. (Backlog item "Corriger les contrastes insuffisants et l'année du pied de page", no issue yet.)
 - The footer still says "© 2025". (In #34.)
 - The landing page demo and testimonials use **real company names** (McKinsey, CIH Bank, Deloitte, BMCE Capital, Attijariwafa, OCP Group) with invented quotes attributed to people at those firms. Flagged on 2026-10-27; now #34 (backlog, outside Sprint 4). Sprint 1 fixtures use only invented companies.
+
+## Beta signups closed until #11 (#47)
+
+Since #47, the landing page no longer shows the signup form: the `#beta` card shows a notice instead (`components/BetaSignupNotice.js`, « Nous ne collectons aucune donnée pour l'instant. ») with a link to `/essayer`. No page calls `/api/subscribe` any more, so no visitor fills in a form that fails.
+
+- `app/api/subscribe/route.js` is **unchanged**: it still fails in production (read-only filesystem, see « Blocking » above) and stores nothing, but nothing calls it.
+- The old `SubscribeForm` function stays in `app/page.js`, unused, on purpose (so PRs #41 and #43 merge cleanly).
+- **#11 (PR #41) restores the form:** it puts `<SubscribeForm />` back in the card, deletes `BetaSignupNotice` and its test, the `#47` import line and this section, and sets the hero badge, hero button and section title back to the signup wording (checklist on #11).

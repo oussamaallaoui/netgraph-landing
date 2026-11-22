@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
+import BetaSignupNotice from '../components/BetaSignupNotice' // #47: removed when #11 (PR #41) merges
 // ── Données ──────────────────────────────────────────────────────
 
 // Votre réseau : vous, vos contacts (1er degré) et leurs contacts (2e degré)
@@ -447,7 +448,7 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
             bg-violet-light text-violet text-xs font-medium mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-signal"></span>
-            Accès beta ouvert
+            Inscriptions à la beta bientôt ouvertes
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-semibold text-ink leading-[1.12] tracking-tight mb-6">
@@ -467,7 +468,7 @@ export default function LandingPage() {
               className="flex items-center justify-center gap-2 w-full px-6 py-4 rounded-2xl
                 bg-violet text-white font-medium text-base hover:bg-violet-dark
                 transition-all hover:shadow-lg hover:shadow-violet/20">
-              Rejoindre la beta gratuite
+              Découvrir la beta
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
@@ -664,7 +665,7 @@ export default function LandingPage() {
               Beta ouverte — accès gratuit pendant 3 mois
             </div>
             <h2 className="text-2xl sm:text-3xl font-semibold text-ink mb-3">
-              Rejoignez les premiers
+              Les inscriptions ouvrent bientôt
             </h2>
             <p className="text-slate text-sm leading-relaxed">
               Les 100 premiers inscrits ont accès gratuitement pendant 3 mois,
@@ -673,7 +674,7 @@ export default function LandingPage() {
           </div>
 
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-            <SubscribeForm />
+            <BetaSignupNotice />
           </div>
 
           {/* Garanties */}
